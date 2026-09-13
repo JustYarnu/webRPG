@@ -1,0 +1,6 @@
+- [] Player character
+- [] Basic gameplay loop
+- [] Events
+- [] Combat
+- [] Professions
+- []
