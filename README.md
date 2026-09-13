@@ -25,7 +25,7 @@ The basic gameplay loop consists of exploration of areas, done via clicking a bu
 - Locate: Finds either an NPC or building.
 
 ### Procedural generation
-Almost everything in the game is procedurally generated using a rigorous generator. This randomization makes sure no one area is necessarily obsolete. It also makes sure no one most effective item exists. Generation is dependent on a certain "points" budget which is spread across several areas until every point is used. This budget is dependent on the items required level. The game also generates sprites, this consists of a basic base sprite which contains slight variations depending on the type of item, a spike trap for example can have differently colored tips depending on the type of elemental damage.
+Almost everything in the game is procedurally generated using a rigorous generator. This randomization makes sure no one area is necessarily obsolete, technically speaking. It also makes sure no one most effective item exists, again, technically speaking. Generation is dependent on a certain "points" budget which is spread across several areas until every point is used. This budget is dependent on the items required level. The game also generates sprites, this consists of a basic base sprite which contains slight variations depending on the type of item, a spike trap for example can have differently colored tips depending on the type of elemental damage.
 
 ### Player character
 Alongside professions, the player character has multiple stats and slots to equip armor and weapons:

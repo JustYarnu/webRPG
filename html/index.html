@@ -1,1 +1,35 @@
-<html></html>
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>webRPG</title>
+	</head>
+	<body>
+		<main>
+			<h1 data-player-name>Loading...</h1>
+			<p data-player-status>Player state is loading.</p>
+			<dl>
+				<div>
+					<dt>Level</dt>
+					<dd data-player-level>-</dd>
+                    <dd data-player-experience>-</dd>
+				</div>
+				<div>
+					<dt>HP</dt>
+					<dd data-player-hp>-</dd>
+				</div>
+				<div>
+					<dt>Coins</dt>
+					<dd data-player-coins>-</dd>
+				</div>
+				<div>
+					<dt>Gems</dt>
+					<dd data-player-gems>-</dd>
+				</div>
+			</dl>
+			<button type="button" data-add-xp>Add 10 XP</button>
+		</main>
+		<script type="module" src="../js/player.js"></script>
+	</body>
+</html>

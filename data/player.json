@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"name": "Test player",
+	"level": 1,
+	"experience": 0,
+	"hp": {
+		"current": 100,
+		"maximum": 100
+	},
+	"coins": 0,
+	"gems": 0,
+	"professions": {
+		"alchemy": {
+			"level": 1,
+			"experience": 0
+		},
+		"sorcery": {
+			"level": 1,
+			"experience": 0
+		},
+		"artifice": {
+			"level": 1,
+			"experience": 0
+		}
+	},
+	"equipment": {
+		"head": null,
+		"chest": null,
+		"hands": null,
+		"legs": null,
+		"weapon": null
+	},
+	"inventory": [],
+	"statistics": {
+		"explorationAttempts": 0,
+		"encountersWon": 0
+	}
+}
