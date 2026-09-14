@@ -3,18 +3,12 @@
         {
             "id": 1,
             "name": "Starting Area",
-            "description": "The beginning.",
-            "enemy_types": [
-            ],
-            "point_budget_min": 1,
-            "point_budget_max": 3
+            "description": "The beginning."
         },
         {
             "id": 2,
             "name": "Forest",
-            "description": "The woods",
-            "enemy_types": [
-            ]
+            "description": "The woods"
         }
     ]
 }

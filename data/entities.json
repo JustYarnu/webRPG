@@ -1,0 +1,15 @@
+{
+    "items":[
+        {
+            "id": 1,
+            "area_id": 1,
+            "name": "Example Item",
+            "description": "An {name}, the first of many.",
+            "required_level" : {
+                "type": "alchemy",
+                "level": 1
+            }
+        }
+    ],
+    "enemies":[]
+}

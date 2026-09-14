@@ -29,7 +29,29 @@
 				</div>
 			</dl>
 			<button type="button" data-add-xp>Add 10 XP</button>
+			<button type="button" data-open-area-picker>Select area</button>
+			<button type="button" data-explore>Explore</button>
+			<p data-selected-area>No area selected.</p>
+			<p data-area-status>Areas are loading.</p>
+			<p data-explore-result></p>
+			<dialog data-area-dialog>
+				<form method="dialog">
+					<h2>Select an area</h2>
+					<div data-area-list></div>
+					<button type="submit">Cancel</button>
+				</form>
+			</dialog>
+			<dialog data-event-dialog>
+				<form method="dialog">
+					<h2 data-event-title>Event found</h2>
+					<p data-event-message></p>
+					<button value="cancel">Cancel</button>
+					<button value="engage">Engage</button>
+				</form>
+			</dialog>
 		</main>
 		<script type="module" src="../js/player.js"></script>
+		<script type="module" src="../js/areas.js"></script>
+		<script type="module" src="../js/explorer.js"></script>
 	</body>
 </html>
