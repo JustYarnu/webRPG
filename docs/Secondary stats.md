@@ -1,4 +1,4 @@
-# Global secondary stats
+# Global secondary stats (all)
 - Percentual element type dmg up/down
 - Numerical element type dmg up/down
 - Numerical dmg up/down
@@ -6,7 +6,7 @@
 - Crit chance up/down
 - Crit damage up/down
 
-# Alchemy secondary stats
+# Alchemy secondary stats (potion ingredients)
 - Percentual DoT up/down
 - Numerical DoT up/down
 - Percentual exp boost
@@ -31,7 +31,7 @@
 - Numerical potion purity up/down (decreases negative stats)
 - Percentual potion purity up/down (decreases negative stats) 
 
-# Sorcery secondary stats
+# Sorcery secondary stats (scroll ingredients)
 - Percentual slot effectiveness up/down (increases primary stats)
 - Numerical slot effectiveness up/down (increases primary stats)
 - Numerical slot increase
@@ -40,7 +40,7 @@
 - Percentual affinity shift (converts part of one elemental damage type into another)
 - Numerical affinity shift (converts part of one elemental damage type into another)
 
-# Artifice secondary stats
+# Artifice secondary stats (armor, weapons and traps)
 - Percentual conditional up/down
 - Numerical conditional up/down
 - Numerical number of activation up/down

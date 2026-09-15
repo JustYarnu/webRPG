@@ -32,12 +32,18 @@ function readSavedPlayer() {
     }
 }
 
-function savePlayer() {
+export function savePlayer() {
     localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(playerState));
 }
 
 function renderPlayer() {
-    document.querySelector("[data-player-name]").textContent = playerState.name;
+    const playerName = document.querySelector("[data-player-name]");
+
+    if (!playerName) {
+        return;
+    }
+
+    playerName.textContent = playerState.name;
     document.querySelector("[data-player-level]").textContent = `Level ${playerState.level}`;
     document.querySelector("[data-player-experience]").textContent = playerState.experience;
     document.querySelector("[data-player-hp]").textContent =
@@ -52,23 +58,39 @@ function updatePlayer(updater) {
     renderPlayer();
 }
 
+export const playerReady = startGame();
+
+export async function addItem(item) {
+    await playerReady;
+    updatePlayer((player) => {
+        player.inventory.push(item);
+    });
+}
+
 async function startGame() {
     const defaultPlayer = await loadDefaultPlayer();
     playerState = readSavedPlayer() ?? clone(defaultPlayer);
     savePlayer();
     renderPlayer();
-    document.querySelector("[data-player-status]").textContent =
-        "Player state loaded.";
+    const playerStatus = document.querySelector("[data-player-status]");
+    if (playerStatus) {
+        playerStatus.textContent = "Player state loaded.";
+    }
 }
 
-document.querySelector("[data-add-xp]").addEventListener("click", () => {
-    updatePlayer((player) => {
-        player.experience += 10;
+const addExperienceButton = document.querySelector("[data-add-xp]");
+if (addExperienceButton) {
+    addExperienceButton.addEventListener("click", () => {
+        updatePlayer((player) => {
+            player.experience += 10;
+        });
     });
-});
+}
 
-startGame().catch((error) => {
+playerReady.catch((error) => {
     console.error(error);
-    document.querySelector("[data-player-status]").textContent =
-        "Unable to load player data.";
+    const playerStatus = document.querySelector("[data-player-status]");
+    if (playerStatus) {
+        playerStatus.textContent = "Unable to load player data.";
+    }
 });

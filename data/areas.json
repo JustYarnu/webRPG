@@ -9,6 +9,46 @@
             "id": 2,
             "name": "Forest",
             "description": "The woods"
+        },
+        {
+            "id": 3,
+            "name": "Desert",
+            "description": "The desert"
+        },
+        {
+            "id": 4,
+            "name": "Mountains",
+            "description": "The mountains"
+        },
+        {
+            "id": 5,
+            "name": "Swamp",
+            "description": "The swamp"
+        },
+        {
+            "id": 6,
+            "name": "Cave",
+            "description": "The cave"
+        },
+        {
+            "id": 7,
+            "name": "Castle",
+            "description": "The castle"
+        },
+        {
+            "id": 8,
+            "name": "Dungeon",
+            "description": "The dungeon"
+        },
+        {
+            "id": 9,
+            "name": "Volcano",
+            "description": "The volcano"
+        },
+        {
+            "id": 10,
+            "name": "Ocean",
+            "description": "I really need to get better descriptions. But it's ok cause they're all placeholders anyway."
         }
     ]
 }

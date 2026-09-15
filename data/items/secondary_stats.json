@@ -1,0 +1,56 @@
+{
+  "global": [
+    "pElementDamage",
+    "nElementDamage",
+    "nDamage",
+    "pDamage",
+    "pCritChance",
+    "pCritDamage"
+  ],
+
+  "alchemy": [
+    "pDot",
+    "nDot",
+    "pExpBoost",
+    "pLuck",
+    "nLuck",
+    "pDuration",
+    "nDuration",
+    "pHp",
+    "nHp",
+    "pDamageReduction",
+    "nDamageReduction",
+    "pDamageTaken",
+    "nDamageTaken",
+    "pElementResistance",
+    "nElementResistance",
+    "pPotionPotency",
+    "nPotionPotency",
+    "pPotionEffectiveness",
+    "nPotionEffectiveness",
+    "pPotionQuality",
+    "nPotionQuality",
+    "nPotionPurity",
+    "pPotionPurity"
+  ],
+
+  "sorcery": [
+    "pSlotEffectiveness",
+    "nSlotEffectiveness",
+    "nSlotIncrease",
+    "nTargetIncrease",
+    "pEchoChance",
+    "pAffinityShift",
+    "nAffinityShift"
+  ],
+
+  "artifice": [
+    "pConditional",
+    "nConditional",
+    "nActivationCount",
+    "nPotionEffectiveness",
+    "nScrollEffectiveness",
+    "nSellValue",
+    "pSellValue"
+  ]
+}

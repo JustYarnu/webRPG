@@ -8,6 +8,17 @@
 	<body>
 		<main>
 			<h1>Forage Event</h1>
+			<p data-forage-status>Searching the area...</p>
+			<a href="index.html">Return to exploration</a>
+			<dialog data-forage-dialog>
+				<form method="dialog">
+					<h2>You found something</h2>
+					<p data-item-name></p>
+					<button value="leave">Leave it</button>
+					<button value="take">Take it</button>
+				</form>
+			</dialog>
 		</main>
+		<script type="module" src="../js/controllers/forage_controller.js"></script>
 	</body>
 </html>
