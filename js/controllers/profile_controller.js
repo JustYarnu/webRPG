@@ -1,4 +1,4 @@
-import { getPlayerState, getRequiredExp } from "./player_controller.js";
+import { getPlayerState, getRequiredExp, getTotalRequiredExp } from "./player_controller.js";
 
 const status = document.querySelector("[data-profile-status]");
 const inventoryList = document.querySelector("[data-inventory-list]");
@@ -63,7 +63,7 @@ getPlayerState()
     .then((player) => {
         document.querySelector("[data-profile-name]").textContent = player.name;
         document.querySelector("[data-profile-level]").textContent = `Level ${player.level}`;
-        document.querySelector("[data-profile-experience]").textContent = `${player.experience} / ${getRequiredExp(player.level)}`;
+        document.querySelector("[data-profile-experience]").textContent = `${player.experience} / ${getTotalRequiredExp(player.level)}`;
         document.querySelector("[data-profile-hp]").textContent =
             `${player.hp.current} / ${player.hp.maximum}`;
         document.querySelector("[data-profile-coins]").textContent = player.coins;

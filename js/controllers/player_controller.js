@@ -46,7 +46,7 @@ function renderPlayer() {
     playerName.textContent = playerState.name;
     document.querySelector("[data-player-level]").textContent = `Level ${playerState.level}`;
     document.querySelector("[data-player-experience]").textContent = playerState.experience;
-    const requiredExperience = getRequiredExp(playerState.level);
+    const requiredExperience = getTotalRequiredExp(playerState.level);
     const experienceProgress = Math.min(
         100,
         (playerState.experience / requiredExperience) * 100,
@@ -81,7 +81,7 @@ export async function getPlayerState() {
     return clone(playerState);
 }
 
-export function getRequiredExp(level) {
+function getRequiredExp(level) {
     if (level <= 1) {
         return 100;
     }
@@ -91,13 +91,21 @@ export function getRequiredExp(level) {
     return Math.round(polynomial * exponential);
 }
 
+export function getTotalRequiredExp(level) {
+    let totalExp = 0;
+    for (let i = 1; i < level; i++) {
+        totalExp += getRequiredExp(i)
+    }
+    return totalExp
+}
+
 export async function addExperience(amount) {
     await playerReady;
     let levelsGained = 0;
 
     updatePlayer((player) => {
         player.experience += amount;
-        while (player.experience >= getRequiredExp(player.level)) {
+        while (player.experience >= getTotalRequiredExp(player.level)) {
             player.level += 1;
             levelsGained += 1;
         }
