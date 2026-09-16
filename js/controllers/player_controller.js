@@ -46,6 +46,15 @@ function renderPlayer() {
     playerName.textContent = playerState.name;
     document.querySelector("[data-player-level]").textContent = `Level ${playerState.level}`;
     document.querySelector("[data-player-experience]").textContent = playerState.experience;
+    const requiredExperience = getRequiredExp(playerState.level);
+    const experienceProgress = Math.min(
+        100,
+        (playerState.experience / requiredExperience) * 100,
+    );
+    const experienceProgressBar = document.querySelector("[data-xp-progress]");
+    if (experienceProgressBar) {
+        experienceProgressBar.style.width = `${experienceProgress}%`;
+    }
     document.querySelector("[data-player-hp]").textContent =
         `${playerState.hp.current} / ${playerState.hp.maximum}`;
     document.querySelector("[data-player-coins]").textContent = playerState.coins;
@@ -67,6 +76,36 @@ export async function addItem(item) {
     });
 }
 
+export async function getPlayerState() {
+    await playerReady;
+    return clone(playerState);
+}
+
+export function getRequiredExp(level) {
+    if (level <= 1) {
+        return 100;
+    }
+
+    const polynomial = 100 + 4.61 * Math.pow(level - 1, 1.25);
+    const exponential = Math.exp(0.00015 * (level - 1));
+    return Math.round(polynomial * exponential);
+}
+
+export async function addExperience(amount) {
+    await playerReady;
+    let levelsGained = 0;
+
+    updatePlayer((player) => {
+        player.experience += amount;
+        while (player.experience >= getRequiredExp(player.level)) {
+            player.level += 1;
+            levelsGained += 1;
+        }
+    });
+
+    return levelsGained;
+}
+
 async function startGame() {
     const defaultPlayer = await loadDefaultPlayer();
     playerState = readSavedPlayer() ?? clone(defaultPlayer);
@@ -80,11 +119,7 @@ async function startGame() {
 
 const addExperienceButton = document.querySelector("[data-add-xp]");
 if (addExperienceButton) {
-    addExperienceButton.addEventListener("click", () => {
-        updatePlayer((player) => {
-            player.experience += 10;
-        });
-    });
+    addExperienceButton.addEventListener("click", () => addExperience(10));
 }
 
 playerReady.catch((error) => {

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Player | webRPG</title>
+		<link rel="stylesheet" href="../css/style.css" />
+	</head>
+	<body>
+		<nav class="site-nav" aria-label="Main navigation">
+			<a class="site-nav__brand" href="index.html">webRPG</a>
+			<a class="site-nav__active" href="player.html" aria-current="page">Player</a>
+		</nav>
+		<main class="profile-layout">
+			<header class="page-heading">
+				<p class="eyebrow">Character</p>
+				<h1 data-profile-name>Loading player...</h1>
+				<p data-profile-status>Loading player state.</p>
+			</header>
+			<section class="profile-card" aria-labelledby="stats-heading">
+				<p class="eyebrow">Overview</p>
+				<h2 id="stats-heading">Player state</h2>
+				<dl class="stat-list">
+					<div><dt>Level</dt><dd data-profile-level>-</dd></div>
+					<div><dt>Experience</dt><dd data-profile-experience>-</dd></div>
+					<div><dt>Health</dt><dd data-profile-hp>-</dd></div>
+					<div><dt>Coins</dt><dd data-profile-coins>-</dd></div>
+					<div><dt>Gems</dt><dd data-profile-gems>-</dd></div>
+				</dl>
+			</section>
+			<section class="inventory-panel" aria-labelledby="inventory-heading">
+				<div class="section-heading">
+					<div>
+						<p class="eyebrow">Collected items</p>
+						<h2 id="inventory-heading">Inventory</h2>
+					</div>
+					<span class="item-count" data-inventory-count>0 items</span>
+				</div>
+				<ul class="inventory-list" data-inventory-list></ul>
+				<p class="empty-state" data-inventory-empty>Your inventory is empty.</p>
+			</section>
+			<dialog data-item-dialog>
+				<form method="dialog">
+					<p class="eyebrow">Item details</p>
+					<h2 data-dialog-item-name>Item</h2>
+					<dl class="detail-list" data-item-details></dl>
+					<button value="close">Close</button>
+				</form>
+			</dialog>
+		</main>
+		<script type="module" src="../js/controllers/player_controller.js"></script>
+		<script type="module" src="../js/controllers/profile_controller.js"></script>
+	</body>
+</html>

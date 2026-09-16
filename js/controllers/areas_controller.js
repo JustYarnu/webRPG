@@ -17,12 +17,14 @@ function renderAreas() {
     areaList.replaceChildren();
 
     for (const area of areas) {
+        const areaItem = document.createElement("li");
         const areaButton = document.createElement("button");
         areaButton.type = "button";
         areaButton.dataset.areaId = area.id;
         areaButton.textContent = area.name;
         areaButton.addEventListener("click", () => selectArea(area.id));
-        areaList.append(areaButton);
+        areaItem.append(areaButton);
+        areaList.append(areaItem);
     }
 }
 

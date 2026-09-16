@@ -4,49 +4,48 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>webRPG</title>
+		<link rel="stylesheet" href="../css/style.css" />
 	</head>
-	<body>
-		<main>
-			<h1 data-player-name>Loading...</h1>
-			<p data-player-status>Player state is loading.</p>
-			<dl>
-				<div>
-					<dt>Level</dt>
-					<dd data-player-level>-</dd>
-                    <dd data-player-experience>-</dd>
+	<body class="game-screen">
+		<nav class="site-nav" aria-label="Main navigation">
+			<a class="site-nav__brand" href="index.html">webRPG</a>
+			<a href="player.html">Player</a>
+		</nav>
+		<main class="game-board">
+			<section class="player-info-panel" aria-label="Player information">
+				<h1 data-player-name>Loading player...</h1>
+				<p><span data-player-level>Level -</span><br /><span data-player-experience>0</span> XP</p>
+				<div class="xp-progress" aria-label="Experience progress">
+					<span data-xp-progress></span>
 				</div>
-				<div>
-					<dt>HP</dt>
-					<dd data-player-hp>-</dd>
+				<p class="visually-hidden" data-player-status>Player state is loading.</p>
+				<span class="visually-hidden" data-player-hp>-</span>
+				<span class="visually-hidden" data-player-coins>-</span>
+				<span class="visually-hidden" data-player-gems>-</span>
+				<a href="player.html">View inventory</a>
+			</section>
+			<section class="area-select-panel" aria-label="Area selection">
+				<button class="rail-button" type="button" data-open-area-picker>Select area</button>
+			</section>
+			<section class="right-rail" aria-label="Exploration status">
+				<div class="history-belt" data-history-belt aria-label="Exploration history"></div>
+			</section>
+			<section class="exploration-center">
+				<p class="current-area-label">Current area: <span data-selected-area>No area selected.</span></p>
+				<p class="area-description" data-area-status>Areas are loading.</p>
+				<div class="explore-control">
+					<button class="explore-button" type="button" data-explore>
+						<span>Explore</span>
+						<span class="explore-cooldown" data-explore-cooldown aria-hidden="true"></span>
+					</button>
 				</div>
-				<div>
-					<dt>Coins</dt>
-					<dd data-player-coins>-</dd>
-				</div>
-				<div>
-					<dt>Gems</dt>
-					<dd data-player-gems>-</dd>
-				</div>
-			</dl>
-			<button type="button" data-add-xp>Add 10 XP</button>
-			<button type="button" data-open-area-picker>Select area</button>
-			<button type="button" data-explore>Explore</button>
-			<p data-selected-area>No area selected.</p>
-			<p data-area-status>Areas are loading.</p>
-			<p data-explore-result></p>
+				<p class="xp-notification" data-xp-notification hidden>XP notification</p>
+			</section>
 			<dialog data-area-dialog>
 				<form method="dialog">
 					<h2>Select an area</h2>
-					<div data-area-list></div>
-					<button type="submit">Cancel</button>
-				</form>
-			</dialog>
-			<dialog data-event-dialog>
-				<form method="dialog">
-					<h2 data-event-title>Event found</h2>
-					<p data-event-message></p>
-					<button value="cancel">Cancel</button>
-					<button value="engage">Engage</button>
+					<ul class="area-list" data-area-list></ul>
+					<button class="button button--secondary" type="submit">Cancel</button>
 				</form>
 			</dialog>
 		</main>
