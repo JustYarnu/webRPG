@@ -9,6 +9,7 @@
 	<body>
 		<nav class="site-nav" aria-label="Main navigation">
 			<a class="site-nav__brand" href="index.html">webRPG</a>
+			<a href="alchemy_crafting.html">Alchemy</a>
 			<a class="site-nav__active" href="player.html" aria-current="page">Player</a>
 		</nav>
 		<main class="profile-layout">
@@ -48,7 +49,12 @@
 				</form>
 			</dialog>
 		</main>
-		<script type="module" src="../js/controllers/player_controller.js"></script>
-		<script type="module" src="../js/controllers/profile_controller.js"></script>
+		<script type="module">
+			import { initPlayerUI } from "../js/controllers/player_controller.js";
+			import { initProfileUI } from "../js/controllers/profile_controller.js";
+
+			initPlayerUI();
+			initProfileUI();
+		</script>
 	</body>
 </html>

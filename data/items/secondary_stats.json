@@ -16,8 +16,8 @@
     "nLuck",
     "pDuration",
     "nDuration",
-    "pHp",
-    "nHp",
+    "pHP",
+    "nHP",
     "pDamageReduction",
     "nDamageReduction",
     "pDamageTaken",
@@ -32,25 +32,5 @@
     "nPotionQuality",
     "nPotionPurity",
     "pPotionPurity"
-  ],
-
-  "sorcery": [
-    "pSlotEffectiveness",
-    "nSlotEffectiveness",
-    "nSlotIncrease",
-    "nTargetIncrease",
-    "pEchoChance",
-    "pAffinityShift",
-    "nAffinityShift"
-  ],
-
-  "artifice": [
-    "pConditional",
-    "nConditional",
-    "nActivationCount",
-    "nPotionEffectiveness",
-    "nScrollEffectiveness",
-    "nSellValue",
-    "pSellValue"
   ]
 }

@@ -1,6 +1,7 @@
 import prefixesData from '../../data/items/prefixes.json' with { type: 'json' };
 import nounsData from '../../data/items/nouns.json' with { type: 'json' };
 import suffixesData from '../../data/items/suffixes.json' with { type: 'json' };
+import { selectedArea } from '../controllers/areas_controller';
 
 const prefixList = prefixesData.prefixes;
 const nounList = nounsData.nouns;
@@ -10,7 +11,7 @@ const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 export function generateItem(type, areaId) {
     const numericalAreaId = Number(areaId)
-    const nounCandidates = nounList.filter(n => n.type === type && n.areas.includes(numericalAreaId));
+    const nounCandidates = nounList.filter(n => n.type === type && n.areas.includes(numericalAreaId) && n.areas.includes(selectedArea.areaId));
 
     if (nounCandidates.length === 0) {
         throw new Error(`No noun candidates found for item type: "${type}"`);
@@ -27,8 +28,8 @@ export function generateItem(type, areaId) {
     return {
         name: `${prefixObj.prefix} ${noun} ${suffixObj.suffix}`,
         type: itemType,
-        prefixStats: prefixObj.damage_types || [],
-        suffixStats: suffixObj.secondary_stats || [],
+        "Element(s)": prefixObj.damage_types || [],
+        "Secondary Stats": suffixObj.secondary_stats || [],
         ...additionalNounStats
     };
 }

@@ -1,51 +1,56 @@
-import { getPlayerState, getRequiredExp, getTotalRequiredExp } from "./player_controller.js";
+import { getProfileOverview, getItemAttributes } from "../services/profile_service.js";
 
-const status = document.querySelector("[data-profile-status]");
-const inventoryList = document.querySelector("[data-inventory-list]");
-const emptyState = document.querySelector("[data-inventory-empty]");
-const itemCount = document.querySelector("[data-inventory-count]");
-const itemDialog = document.querySelector("[data-item-dialog]");
+let statusEl, inventoryListEl, emptyStateEl, itemCountEl, itemDialogEl;
 
-function formatValue(value) {
-    if (Array.isArray(value)) {
-        return value.length > 0 ? value.join(", ") : "None";
+export async function initProfileUI() {
+    statusEl = document.querySelector("[data-profile-status]");
+    inventoryListEl = document.querySelector("[data-inventory-list]");
+
+    if (!statusEl || !inventoryListEl) return;
+
+    emptyStateEl = document.querySelector("[data-inventory-empty]");
+    itemCountEl = document.querySelector("[data-inventory-count]");
+    itemDialogEl = document.querySelector("[data-item-dialog]");
+
+    try {
+        const profile = await getProfileOverview();
+        renderProfileStats(profile);
+        renderInventory(profile.inventory);
+        statusEl.textContent = "Player state loaded.";
+    } catch (error) {
+        console.error(error);
+        statusEl.textContent = "Unable to load player data.";
     }
-
-    if (value && typeof value === "object") {
-        return Object.entries(value)
-            .map(([key, nestedValue]) => `${key}: ${formatValue(nestedValue)}`)
-            .join("; ");
-    }
-
-    return String(value);
 }
 
-function renderItemDetails(item) {
-    document.querySelector("[data-dialog-item-name]").textContent = item.name;
-    const details = document.querySelector("[data-item-details]");
-    details.replaceChildren();
+function renderProfileStats(profile) {
+    const nameEl = document.querySelector("[data-profile-name]");
+    const levelEl = document.querySelector("[data-profile-level]");
+    const expEl = document.querySelector("[data-profile-experience]");
+    const hpEl = document.querySelector("[data-profile-hp]");
+    const coinsEl = document.querySelector("[data-profile-coins]");
+    const gemsEl = document.querySelector("[data-profile-gems]");
 
-    for (const [key, value] of Object.entries(item)) {
-        if (key === "name") {
-            continue;
-        }
-
-        const row = document.createElement("div");
-        const label = document.createElement("dt");
-        const detail = document.createElement("dd");
-        label.textContent = key;
-        detail.textContent = formatValue(value);
-        row.append(label, detail);
-        details.append(row);
-    }
-
-    itemDialog.showModal();
+    if (nameEl) nameEl.textContent = profile.name;
+    if (levelEl) levelEl.textContent = `Level ${profile.level}`;
+    if (expEl) expEl.textContent = `${profile.experience} / ${profile.requiredExp}`;
+    if (hpEl) hpEl.textContent = `${profile.hp.current} / ${profile.hp.maximum}`;
+    if (coinsEl) coinsEl.textContent = profile.coins;
+    if (gemsEl) gemsEl.textContent = profile.gems;
 }
 
 function renderInventory(inventory) {
-    inventoryList.replaceChildren();
-    itemCount.textContent = `${inventory.length} ${inventory.length === 1 ? "item" : "items"}`;
-    emptyState.hidden = inventory.length > 0;
+    if (!inventoryListEl) return;
+
+    inventoryListEl.replaceChildren();
+
+    if (itemCountEl) {
+        itemCountEl.textContent = `${inventory.length} ${inventory.length === 1 ? "item" : "items"}`;
+    }
+
+    if (emptyStateEl) {
+        emptyStateEl.hidden = inventory.length > 0;
+    }
 
     for (const item of inventory) {
         const entry = document.createElement("li");
@@ -55,24 +60,34 @@ function renderInventory(inventory) {
         button.innerHTML = `<span>${item.name}</span><span aria-hidden="true">&gt;</span>`;
         button.addEventListener("click", () => renderItemDetails(item));
         entry.append(button);
-        inventoryList.append(entry);
+        inventoryListEl.append(entry);
     }
 }
 
-getPlayerState()
-    .then((player) => {
-        document.querySelector("[data-profile-name]").textContent = player.name;
-        document.querySelector("[data-profile-level]").textContent = `Level ${player.level}`;
-        document.querySelector("[data-profile-experience]").textContent = `${player.experience} / ${getTotalRequiredExp(player.level)}`;
-        document.querySelector("[data-profile-hp]").textContent =
-            `${player.hp.current} / ${player.hp.maximum}`;
-        document.querySelector("[data-profile-coins]").textContent = player.coins;
-        document.querySelector("[data-profile-gems]").textContent = player.gems;
-        renderInventory(player.inventory);
-        status.textContent = "Player state loaded.";
-    })
-    .catch((error) => {
-        console.error(error);
-        status.textContent = "Unable to load player data.";
-    });
+function renderItemDetails(item) {
+    if (!itemDialogEl) return;
 
+    const dialogNameEl = document.querySelector("[data-dialog-item-name]");
+    const detailsEl = document.querySelector("[data-item-details]");
+
+    if (dialogNameEl) dialogNameEl.textContent = item.name;
+
+    if (detailsEl) {
+        detailsEl.replaceChildren();
+        const attributes = getItemAttributes(item);
+
+        for (const { label, value } of attributes) {
+            const row = document.createElement("div");
+            const dt = document.createElement("dt");
+            const dd = document.createElement("dd");
+            dt.textContent = label;
+            dd.textContent = value;
+            row.append(dt, dd);
+            detailsEl.append(row);
+        }
+    }
+
+    if (typeof itemDialogEl.showModal === "function") {
+        itemDialogEl.showModal();
+    }
+}

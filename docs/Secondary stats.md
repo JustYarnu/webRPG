@@ -29,23 +29,7 @@
 - Percentual potion quality up/down (primary & secondary stats)
 - Numerical potion quality up/down (primary & secondary stats)
 - Numerical potion purity up/down (decreases negative stats)
-- Percentual potion purity up/down (decreases negative stats) 
+- Percentual potion purity up/down (decreases negative stats)
 
-# Sorcery secondary stats (scroll ingredients)
-- Percentual slot effectiveness up/down (increases primary stats)
-- Numerical slot effectiveness up/down (increases primary stats)
-- Numerical slot increase
-- Numerical target increase
-- Percentual echo chance (recast chance)
-- Percentual affinity shift (converts part of one elemental damage type into another)
-- Numerical affinity shift (converts part of one elemental damage type into another)
 
-# Artifice secondary stats (armor, weapons and traps)
-- Percentual conditional up/down
-- Numerical conditional up/down
-- Numerical number of activation up/down
-- Numerical potion effectiveness up/down
-- Numerical scroll effectiveness up/down
-- Numerical sell value up/down
-- Percentual sell value up/down
 

@@ -9,6 +9,7 @@
 	<body class="game-screen">
 		<nav class="site-nav" aria-label="Main navigation">
 			<a class="site-nav__brand" href="index.html">webRPG</a>
+			<a href="alchemy_crafting.html">Alchemy</a>
 			<a href="player.html">Player</a>
 		</nav>
 		<main class="game-board">
@@ -49,8 +50,14 @@
 				</form>
 			</dialog>
 		</main>
-		<script type="module" src="../js/controllers/player_controller.js"></script>
-		<script type="module" src="../js/controllers/areas_controller.js"></script>
-		<script type="module" src="../js/controllers/explore_controller.js"></script>
+		<script type="module">
+			import { initPlayerUI } from "../js/controllers/player_controller.js";
+			import { initAreaPicker } from "../js/controllers/areas_controller.js";
+			import { initExploreUI } from "../js/controllers/explore_controller.js";
+
+			initPlayerUI();
+			initAreaPicker();
+			initExploreUI();
+		</script>
 	</body>
 </html>

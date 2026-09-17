@@ -4,7 +4,18 @@
             "noun":"flower",
             "type":"alchemy",
             "areas": [1,2,3,4,5,6,7,8,9,10],
-            "essences" : [10,20,10,5,10,60,70]
+            "essences" : [1,2,0]
+        },
+        {
+            "noun":"grains",
+            "type":"alchemy",
+            "areas":[1,2,3,4,5,6,7,8,9,10],
+            "essences":[1,1,1]
+        },
+        {
+            "noun":"leaf",
+            "type":"alchemy",
+            "areas":[1,2,3,4,5,6,7,8,9,10]
         }
     ]
 }

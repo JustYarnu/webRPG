@@ -1,19 +1,9 @@
-let areas = [];
-export let selectedArea = null;
+import { loadAreas, selectArea } from "../services/areas_service.js";
 
-async function loadAreas() {
-    const response = await fetch("../data/areas.json", { cache: "no-store" });
-
-    if (!response.ok) {
-        throw new Error(`Could not load areas (${response.status}).`);
-    }
-
-    const areaData = await response.json();
-    areas = areaData.areas;
-}
-
-function renderAreas() {
+function renderAreas(areas) {
     const areaList = document.querySelector("[data-area-list]");
+    if (!areaList) return;
+
     areaList.replaceChildren();
 
     for (const area of areas) {
@@ -22,38 +12,32 @@ function renderAreas() {
         areaButton.type = "button";
         areaButton.dataset.areaId = area.id;
         areaButton.textContent = area.name;
-        areaButton.addEventListener("click", () => selectArea(area.id));
+        areaButton.addEventListener("click", () => {
+            const selected = selectArea(area.id);
+            document.querySelector("[data-selected-area]").textContent = selected.name;
+            document.querySelector("[data-area-dialog]")?.close();
+        });
         areaItem.append(areaButton);
         areaList.append(areaItem);
     }
 }
 
-export function selectArea(areaId) {
-    selectedArea = areas.find((area) => area.id === Number(areaId)) ?? null;
+export async function initAreaPicker() {
+    const statusEl = document.querySelector("[data-area-status]");
+    const openBtn = document.querySelector("[data-open-area-picker]");
 
-    if (!selectedArea) {
-        throw new Error(`Area ${areaId} does not exist.`);
+    if (!statusEl || !openBtn) return;
+
+    try {
+        const areas = await loadAreas();
+        renderAreas(areas);
+        statusEl.textContent = "Areas loaded. Select an area.";
+
+        openBtn.addEventListener("click", () => {
+            document.querySelector("[data-area-dialog]")?.showModal();
+        });
+    } catch (error) {
+        console.error(error);
+        statusEl.textContent = "Unable to load areas.";
     }
-
-    document.querySelector("[data-selected-area]").textContent = selectedArea.name;
-    document.querySelector("[data-area-dialog]").close();
-    document.dispatchEvent(
-        new CustomEvent("area-selected", { detail: selectedArea }),
-    );
 }
-
-async function startAreaSelection() {
-    await loadAreas();
-    renderAreas();
-    document.querySelector("[data-area-status]").textContent =
-        "Areas loaded. Select an area.";
-    document.querySelector("[data-open-area-picker]").addEventListener("click", () => {
-        document.querySelector("[data-area-dialog]").showModal();
-    });
-}
-
-startAreaSelection().catch((error) => {
-    console.error(error);
-    document.querySelector("[data-area-status]").textContent =
-        "Unable to load areas.";
-});

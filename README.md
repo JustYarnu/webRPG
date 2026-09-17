@@ -4,16 +4,9 @@ webRPG is an extensive yet simple RPG that can be played inside the browser.
 # Features
 
 ## 3 professions, 3 systems
-Progression mainly consists of developing in 3 professions, alchemy, sorcery, and artifice. Each of these professions come with their own systems. These professions require ingredients which can only be used if the player reached the required level with that profession. Increasing the level of a profession expands the amount of base items that can be crafted. Crafted items take up space in your backpack. As such, you will have to upgrade your backpack to carry more items with you. The character can however store an infinite amount of items at home. End-game progression of these systems will require the the use of multiple or all 3 of these professions to craft the highest tier items. E.g.: A potion can be used to tip the spikes of a spike trap, a scroll can be used to inscribe a potion with elemental damage, which can then be used to craft a high-end tipped spike trap.
 
 ### Alchemy
 Crafting potions with alchemy is dependent on a "essence" system where ingredients carry a certain essence that dictate the type of potions. Said ingredients also carry secondary effects that mainly affect numerical values. Most ingredients come with a trade-off of secondary stats and essence points. The challenge becomes balancing these two in order to maximize effectiveness whilst still brewing the potion type you want.
-
-### Sorcery
-Sorcery uses a "scribing" system for crafting spells. Each spell starts with a basic form, e.g.: fireball. These basic forms require a scroll with said basic form already inscribed.  Every basic form has a certain amount of slots which can be filled with modifiers to slightly change the behaviour of the spell, changing things like elemental type and DoT duration. Scrolls also have secondary effects which function as modifiers to slots. For example, a scroll would modify the amount of poison damage on one slot by 50%, using an ingredient in that slot that adds +100% poison damage now gives +150% instead.
-
-### Artifice
-The artifice profession can be used to craft traps, weapons and armor that are triggered when reaching a certain condition which upon activation give certain effects. These effects can be utility heavy or amplify heavy. Different types of traps are unlocked with artifice level. Each trap type requires a fixed amount of basic materials to craft. Upon crafting, these can be modified with ingredients to change the numerical values. Traps are a single-use item. Exclusively, traps are the only crafted item that can be sold. 
 
 ## Gameplay loop
 The basic gameplay loop consists of exploration of areas, done via clicking a button. Each area has a certain set of basic events. Each event can be engaged with manually, these are forage, encounter, loot and locate. The pools for these events depend on the current area. Every button press equates to some xp, but not necessarily an event that triggers. This chance can be increased with alchemy potions. There is however a minor pity system to prevent exceptionally unlucky players from being unable to trigger events.

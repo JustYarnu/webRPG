@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Alchemy | webRPG</title>
+		<link rel="stylesheet" href="../css/style.css" />
+	</head>
+	<body class="game-screen">
+		<nav class="site-nav" aria-label="Main navigation">
+			<a class="site-nav__brand" href="index.html">webRPG</a>
+			<a class="site-nav__active" href="alchemy_crafting.html" aria-current="page">Alchemy</a>
+			<a href="player.html">Player</a>
+		</nav>
+		<main class="alchemy-layout">
+			<section class="alchemy-panel alchemy-panel--ingredients" aria-labelledby="alchemy-heading">
+				<div class="panel-header">
+					<div>
+						<p class="eyebrow">Profession</p>
+						<h1 id="alchemy-heading">Brewing bench</h1>
+					</div>
+					<span class="item-count" data-ingredient-count>0 / 10 selected</span>
+				</div>
+				<label class="search-field" for="ingredient-search">
+					<span class="visually-hidden">Search ingredients</span>
+					<input id="ingredient-search" type="search" data-ingredient-search placeholder="Search ingredients" />
+				</label>
+				<ul class="ingredient-list" data-ingredient-list aria-live="polite"></ul>
+				<p class="empty-state" data-ingredient-empty hidden>No suitable ingredients were found.</p>
+			</section>
+
+			<section class="alchemy-panel alchemy-panel--summary" aria-labelledby="brew-summary-heading">
+				<div class="summary-header">
+					<div>
+						<p class="eyebrow">Brew summary</p>
+						<h2 id="brew-summary-heading">Potion profile</h2>
+					</div>
+					<span class="potion-type-pill" data-current-potion-type>Inert</span>
+				</div>
+
+				<div class="gauge-grid" aria-label="Potion essence gauges">
+					<div class="gauge-card">
+						<div class="gauge-bar" aria-label="Viscosity gauge"><span data-viscosity-fill></span></div>
+						<div class="gauge-meta"><span>Viscosity</span><strong data-viscosity-label>low</strong></div>
+					</div>
+					<div class="gauge-card">
+						<div class="gauge-bar" aria-label="Volatility gauge"><span data-volatility-fill></span></div>
+						<div class="gauge-meta"><span>Volatility</span><strong data-volatility-label>low</strong></div>
+					</div>
+					<div class="gauge-card">
+						<div class="gauge-bar" aria-label="Potency gauge"><span data-potency-fill></span></div>
+						<div class="gauge-meta"><span>Potency</span><strong data-potency-label>low</strong></div>
+					</div>
+				</div>
+
+				<div class="potion-meta-grid">
+					<div class="meta-card">
+						<p class="eyebrow">Dominant element</p>
+						<p data-dominant-element>None</p>
+					</div>
+					<div class="meta-card">
+						<p class="eyebrow">Essence total</p>
+						<p data-essence-total>0</p>
+					</div>
+				</div>
+
+				<div class="stats-card">
+					<p class="eyebrow">Secondary stats</p>
+					<ul class="stat-pill-list" data-secondary-stats>
+						<li class="stat-pill placeholder">No selected ingredients</li>
+					</ul>
+				</div>
+
+				<button class="button button--primary brew-button" type="button" data-brew-button disabled>Brew potion</button>
+			</section>
+		</main>
+		<script type="module">
+			import { initAlchemyUI } from "../js/controllers/potion_controller.js";
+
+			initAlchemyUI();
+		</script>
+	</body>
+</html>
