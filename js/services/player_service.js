@@ -86,6 +86,19 @@ export async function removeItems(items) {
     savePlayer();
 }
 
+export async function setPlayerName(name) {
+    await playerReady;
+    const nextName = String(name).trim();
+
+    if (!nextName || nextName.length > 30) {
+        throw new Error("Character names must be between 1 and 30 characters.");
+    }
+
+    playerState.name = nextName;
+    savePlayer();
+    return nextName;
+}
+
 export async function addExperience(amount) {
     await playerReady;
     let levelsGained = 0;

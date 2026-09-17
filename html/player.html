@@ -15,8 +15,10 @@
 		<main class="profile-layout">
 			<header class="page-heading">
 				<p class="eyebrow">Character</p>
-				<h1 data-profile-name>Loading player...</h1>
-				<p data-profile-status>Loading player state.</p>
+				<div class="profile-name-heading">
+					<h1 data-profile-name>Loading player...</h1>
+					<button class="icon-button" type="button" data-change-name aria-label="Change character name" title="Change character name">&#9998;</button>
+				</div>
 			</header>
 			<section class="profile-card" aria-labelledby="stats-heading">
 				<p class="eyebrow">Overview</p>
@@ -46,6 +48,18 @@
 					<h2 data-dialog-item-name>Item</h2>
 					<dl class="detail-list" data-item-details></dl>
 					<button value="close">Close</button>
+				</form>
+			</dialog>
+			<dialog data-name-dialog>
+				<form method="dialog" data-name-form>
+					<p class="eyebrow">Character</p>
+					<h2>Change name</h2>
+					<label class="name-field" for="character-name">Name</label>
+					<input id="character-name" name="name" type="text" maxlength="30" required data-name-input />
+					<div class="dialog-actions">
+						<button class="button button--secondary" value="cancel">Cancel</button>
+						<button class="button button--primary" value="save">Save</button>
+					</div>
 				</form>
 			</dialog>
 		</main>

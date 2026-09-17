@@ -1,19 +1,20 @@
 import { getProfileOverview, getItemAttributes } from "../services/profile_service.js";
 import { loadAreas } from "../services/areas_service.js";
+import { setPlayerName } from "../services/player_service.js";
 
-let statusEl, inventoryListEl, emptyStateEl, itemCountEl, itemDialogEl;
+let inventoryListEl, emptyStateEl, itemCountEl, itemDialogEl;
 let areas = [];
 let profileLevel = 1;
 
 export async function initProfileUI() {
-    statusEl = document.querySelector("[data-profile-status]");
     inventoryListEl = document.querySelector("[data-inventory-list]");
 
-    if (!statusEl || !inventoryListEl) return;
+    if (!inventoryListEl) return;
 
     emptyStateEl = document.querySelector("[data-inventory-empty]");
     itemCountEl = document.querySelector("[data-inventory-count]");
     itemDialogEl = document.querySelector("[data-item-dialog]");
+    initNameEditor();
 
     try {
         const profile = await getProfileOverview();
@@ -21,11 +22,41 @@ export async function initProfileUI() {
         areas = await loadAreas();
         renderProfileStats(profile);
         renderInventory(profile.inventory);
-        statusEl.textContent = "Player state loaded.";
     } catch (error) {
         console.error(error);
-        statusEl.textContent = "Unable to load player data.";
     }
+}
+
+function initNameEditor() {
+    const changeNameButton = document.querySelector("[data-change-name]");
+    const nameDialog = document.querySelector("[data-name-dialog]");
+    const nameForm = document.querySelector("[data-name-form]");
+    const nameInput = document.querySelector("[data-name-input]");
+
+    if (!changeNameButton || !nameDialog || !nameForm || !nameInput) return;
+
+    changeNameButton.addEventListener("click", () => {
+        nameInput.value = document.querySelector("[data-profile-name]")?.textContent ?? "";
+        nameDialog.showModal();
+        nameInput.select();
+    });
+
+    nameForm.addEventListener("submit", async (event) => {
+        if (nameDialog.returnValue !== "save") return;
+
+        event.preventDefault();
+        try {
+            const name = await setPlayerName(nameInput.value);
+            const nameEl = document.querySelector("[data-profile-name]");
+            if (nameEl) nameEl.textContent = name;
+            nameDialog.close();
+        } catch (error) {
+            console.error(error);
+            nameInput.setCustomValidity(error.message);
+            nameInput.reportValidity();
+            nameInput.setCustomValidity("");
+        }
+    });
 }
 
 function renderProfileStats(profile) {
