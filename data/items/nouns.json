@@ -1,21 +1,274 @@
 {
-    "nouns":[
+    "nouns": [
         {
-            "noun":"flower",
-            "type":"alchemy",
-            "areas": [1,2,3,4,5,6,7,8,9,10],
-            "essences" : [1,2,0]
+            "noun": "flower",
+            "type": "alchemy",
+            "areas": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "essences": [1, 2, 0]
         },
         {
-            "noun":"grains",
-            "type":"alchemy",
-            "areas":[1,2,3,4,5,6,7,8,9,10],
-            "essences":[1,1,1]
+            "noun": "grains",
+            "type": "alchemy",
+            "areas": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "essences": [1, 1, 1]
         },
         {
-            "noun":"leaf",
-            "type":"alchemy",
-            "areas":[1,2,3,4,5,6,7,8,9,10]
+            "noun": "leaf",
+            "type": "alchemy",
+            "areas": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "essences": [1, 2, 1]
+        },
+        {
+            "noun": "solvent",
+            "type": "alchemy",
+            "areas": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "essences": [-2, 0, 0]
+        },
+        {
+            "noun": "reagent",
+            "type": "alchemy",
+            "areas": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "essences": [0, 0, 2]
+        },
+        {
+            "noun": "root",
+            "type": "alchemy",
+            "areas": [1, 2, 3, 5],
+            "essences": [2, 0, 1]
+        },
+        {
+            "noun": "berry",
+            "type": "alchemy",
+            "areas": [2, 3, 5, 8],
+            "essences": [1, 1, 2]
+        },
+        {
+            "noun": "moss",
+            "type": "alchemy",
+            "areas": [1, 3, 5, 10],
+            "essences": [2, -1, 1]
+        },
+        {
+            "noun": "fungus",
+            "type": "alchemy",
+            "areas": [3, 5, 6],
+            "essences": [1, 2, 2]
+        },
+        {
+            "noun": "spores",
+            "type": "alchemy",
+            "areas": [3, 4],
+            "essences": [-2, 3, 1]
+        },
+        {
+            "noun": "bark",
+            "type": "alchemy",
+            "areas": [2, 3, 5],
+            "essences": [3, -1, 0]
+        },
+        {
+            "noun": "sap",
+            "type": "alchemy",
+            "areas": [3, 5, 8],
+            "essences": [3, 0, 2]
+        },
+        {
+            "noun": "resin",
+            "type": "alchemy",
+            "areas": [3, 5],
+            "essences": [4, -1, 2]
+        },
+        {
+            "noun": "seed",
+            "type": "alchemy",
+            "areas": [1, 2, 3, 4],
+            "essences": [0, 1, 1]
+        },
+        {
+            "noun": "thorn",
+            "type": "alchemy",
+            "areas": [3, 4, 6],
+            "essences": [0, 2, 1]
+        },
+        {
+            "noun": "nectar",
+            "type": "alchemy",
+            "areas": [2, 3],
+            "essences": [1, 1, 3]
+        },
+        {
+            "noun": "bone",
+            "type": "alchemy",
+            "areas": [4, 6, 8, 9, 10],
+            "essences": [2, -1, -1]
+        },
+        {
+            "noun": "blood",
+            "type": "alchemy",
+            "areas": [2, 3, 5, 6, 8],
+            "essences": [1, 2, 2]
+        },
+        {
+            "noun": "slime",
+            "type": "alchemy",
+            "areas": [1, 3, 6, 10],
+            "essences": [3, 0, -1]
+        },
+        {
+            "noun": "venom",
+            "type": "alchemy",
+            "areas": [3, 4, 7],
+            "essences": [-1, 3, 3]
+        },
+        {
+            "noun": "gland",
+            "type": "alchemy",
+            "areas": [4, 6, 7, 9],
+            "essences": [1, 2, 2]
+        },
+        {
+            "noun": "scale",
+            "type": "alchemy",
+            "areas": [4, 6, 7, 10],
+            "essences": [1, -2, 1]
+        },
+        {
+            "noun": "ash",
+            "type": "alchemy",
+            "areas": [7],
+            "essences": [-2, 1, 0]
+        },
+        {
+            "noun": "salt",
+            "type": "alchemy",
+            "areas": [4, 10],
+            "essences": [1, -1, -1]
+        },
+        {
+            "noun": "crystal",
+            "type": "alchemy",
+            "areas": [6, 9],
+            "essences": [0, -2, 3]
+        },
+        {
+            "noun": "brimstone",
+            "type": "alchemy",
+            "areas": [7],
+            "essences": [-1, 3, 2]
+        },
+        {
+            "noun": "obsidian",
+            "type": "alchemy",
+            "areas": [7],
+            "essences": [2, -2, 1]
+        },
+        {
+            "noun": "sand",
+            "type": "alchemy",
+            "areas": [4, 10],
+            "essences": [1, -1, 0]
+        },
+        {
+            "noun": "kelp",
+            "type": "alchemy",
+            "areas": [10],
+            "essences": [2, 0, 1]
+        },
+        {
+            "noun": "shell",
+            "type": "alchemy",
+            "areas": [10],
+            "essences": [1, -1, 0]
+        },
+        {
+            "noun": "coral",
+            "type": "alchemy",
+            "areas": [10],
+            "essences": [2, 0, 1]
+        },
+        {
+            "noun": "tuber",
+            "type": "alchemy",
+            "areas": [1, 2, 5, 8],
+            "essences": [2, -1, 1]
+        },
+        {
+            "noun": "pinecone",
+            "type": "alchemy",
+            "areas": [5, 6],
+            "essences": [1, -1, 1]
+        },
+        {
+            "noun": "cacti",
+            "type": "alchemy",
+            "areas": [4],
+            "essences": [1, 1, 1]
+        },
+        {
+            "noun": "frost-dust",
+            "type": "alchemy",
+            "areas": [8, 9],
+            "essences": [-1, -1, -2]
+        },
+        {
+            "noun": "pure-ice",
+            "type": "alchemy",
+            "areas": [9],
+            "essences": [0, -3, 0]
+        },
+        {
+            "noun": "magma-rock",
+            "type": "alchemy",
+            "areas": [7],
+            "essences": [2, 2, 2]
+        },
+        {
+            "noun": "soot",
+            "type": "alchemy",
+            "areas": [6, 7],
+            "essences": [-2, 0, -1]
+        },
+        {
+            "noun": "catalyst",
+            "type": "alchemy",
+            "areas": [6, 7, 9],
+            "essences": [0, 3, 3]
+        },
+        {
+            "noun": "tincture",
+            "type": "alchemy",
+            "areas": [3, 5, 8],
+            "essences": [-2, 1, 2]
+        },
+        {
+            "noun": "distillate",
+            "type": "alchemy",
+            "areas": [4, 6, 9],
+            "essences": [-3, 2, 3]
+        },
+        {
+            "noun": "extract",
+            "type": "alchemy",
+            "areas": [2, 4, 7],
+            "essences": [-1, 1, 2]
+        },
+        {
+            "noun": "dust",
+            "type": "alchemy",
+            "areas": [4, 6],
+            "essences": [-2, 1, -1]
+        },
+        {
+            "noun": "marrow",
+            "type": "alchemy",
+            "areas": [6, 8, 9],
+            "essences": [3, -1, 2]
+        },
+        {
+            "noun": "chitin",
+            "type": "alchemy",
+            "areas": [2, 3, 4, 10],
+            "essences": [2, -1, 0]
         }
     ]
 }

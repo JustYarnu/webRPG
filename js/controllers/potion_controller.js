@@ -6,7 +6,7 @@ import {
     getPotionSummary,
     filterIngredients,
     brewAndSavePotion
-} from "../services/alchemy_service.js";
+} from "../services/potion_service.js";
 
 let ingredientSearch, ingredientList, ingredientEmpty, ingredientCount, brewButton;
 let potionTypeLabel, dominantElementLabel, essenceTotalLabel;
@@ -62,6 +62,7 @@ function updateUI() {
 
 async function handleBrew() {
     await brewAndSavePotion();
+    await loadAlchemyInventory();
     updateUI();
 }
 
@@ -118,7 +119,7 @@ function renderSecondaryStats(summary) {
     secondaryStatsList.replaceChildren();
     const selected = getSelectedIngredients();
 
-    const stats = [...new Set(selected.flatMap((item) => item?.suffixStats ?? item?.secondary_stats ?? []))];
+    const stats = [...new Set(selected.flatMap((item) => item?.secondary_stats ?? item?.suffixStats ?? item?.stats ?? []))];
     if (!stats.length) {
         const placeholder = document.createElement("li");
         placeholder.className = "stat-pill placeholder";
@@ -130,7 +131,7 @@ function renderSecondaryStats(summary) {
     for (const stat of stats) {
         const item = document.createElement("li");
         item.className = "stat-pill";
-        item.textContent = stat;
+        item.textContent = stat.label ?? stat;
         secondaryStatsList.append(item);
     }
 }
@@ -167,8 +168,8 @@ function renderIngredientList() {
 
         const details = document.createElement("div");
         details.className = "ingredient-item__details";
-        const stats = (item.suffixStats ?? item.secondary_stats ?? []).join(" • ") || "No secondary stats";
-        const elements = [...(item.damage_types ?? []), ...(item.prefixStats ?? [])].filter(Boolean).join(" • ") || "Neutral";
+        const stats = (item.secondary_stats ?? item.suffixStats ?? item.stats ?? []).join(" • ") || "No secondary stats";
+        const elements = [...(item.damage_types ?? item.elements ?? []), ...(item.prefixStats ?? [])].filter(Boolean).join(" • ") || "Neutral";
         details.textContent = `${stats} • ${elements}`;
 
         itemButton.append(meta, details);

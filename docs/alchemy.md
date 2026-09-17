@@ -33,7 +33,7 @@ Finally, potency determines the magnitude of the other two gauges. Uniquely, a p
 | Medium | Low | Medium | Tonic |
 | Medium | Low | High | Elixir |
 | Medium | Medium | Low | Fluid |
-| Medium | Medium | Medium | Flask |
+| Medium | Medium | Medium | Elixer |
 | Medium | Medium | High | Splash |
 | Medium | High | Low | Fuming |
 | Medium | High | Medium | Brew |

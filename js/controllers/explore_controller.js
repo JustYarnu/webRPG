@@ -1,4 +1,4 @@
-import { addExperience, playerReady } from "./player_controller.js";
+import { addExperience, playerReady } from "../services/player_service.js";
 import {
     setActiveArea,
     getActiveArea,

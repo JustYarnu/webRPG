@@ -1,5 +1,6 @@
 let areas = [];
 export let selectedArea = null;
+const SELECTED_AREA_STORAGE_KEY = "webRPG.selectedArea.v1";
 
 export async function loadAreas() {
     if (areas.length > 0) return areas;
@@ -21,8 +22,15 @@ export function selectArea(areaId) {
         throw new Error(`Area ${areaId} does not exist.`);
     }
 
+    localStorage.setItem(SELECTED_AREA_STORAGE_KEY, String(selectedArea.id));
+
     document.dispatchEvent(
         new CustomEvent("area-selected", { detail: selectedArea }),
     );
     return selectedArea;
+}
+
+export function getSavedAreaId() {
+    const savedAreaId = Number(localStorage.getItem(SELECTED_AREA_STORAGE_KEY));
+    return Number.isInteger(savedAreaId) && savedAreaId > 0 ? savedAreaId : null;
 }

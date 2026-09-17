@@ -1,4 +1,4 @@
-import { addItem } from "./player_controller.js";
+import { addItem } from "../services/player_service.js";
 import { getForageItem } from "../services/forage_service.js";
 
 export function initForageUI() {

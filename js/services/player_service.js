@@ -70,6 +70,22 @@ export async function addItem(item) {
     savePlayer();
 }
 
+export async function removeItems(items) {
+    await playerReady;
+
+    for (const item of items) {
+        const itemIndex = playerState.inventory.findIndex(
+            (inventoryItem) => JSON.stringify(inventoryItem) === JSON.stringify(item),
+        );
+
+        if (itemIndex >= 0) {
+            playerState.inventory.splice(itemIndex, 1);
+        }
+    }
+
+    savePlayer();
+}
+
 export async function addExperience(amount) {
     await playerReady;
     let levelsGained = 0;

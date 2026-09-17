@@ -1,6 +1,9 @@
 import { getProfileOverview, getItemAttributes } from "../services/profile_service.js";
+import { loadAreas } from "../services/areas_service.js";
 
 let statusEl, inventoryListEl, emptyStateEl, itemCountEl, itemDialogEl;
+let areas = [];
+let profileLevel = 1;
 
 export async function initProfileUI() {
     statusEl = document.querySelector("[data-profile-status]");
@@ -14,6 +17,8 @@ export async function initProfileUI() {
 
     try {
         const profile = await getProfileOverview();
+        profileLevel = profile.level;
+        areas = await loadAreas();
         renderProfileStats(profile);
         renderInventory(profile.inventory);
         statusEl.textContent = "Player state loaded.";
@@ -74,14 +79,14 @@ function renderItemDetails(item) {
 
     if (detailsEl) {
         detailsEl.replaceChildren();
-        const attributes = getItemAttributes(item);
+        const attributes = getItemAttributes(item, areas, profileLevel);
 
         for (const { label, value } of attributes) {
             const row = document.createElement("div");
             const dt = document.createElement("dt");
             const dd = document.createElement("dd");
             dt.textContent = label;
-            dd.textContent = value;
+            renderDetailValue(dd, value);
             row.append(dt, dd);
             detailsEl.append(row);
         }
@@ -90,4 +95,45 @@ function renderItemDetails(item) {
     if (typeof itemDialogEl.showModal === "function") {
         itemDialogEl.showModal();
     }
+}
+
+function renderDetailValue(container, value) {
+    if (Array.isArray(value)) {
+        if (value.length === 0) {
+            container.textContent = "None";
+            return;
+        }
+
+        const list = document.createElement("ul");
+        list.className = "detail-values";
+        for (const entry of value) {
+            const listItem = document.createElement("li");
+            renderDetailValue(listItem, entry);
+            list.append(listItem);
+        }
+        container.append(list);
+        return;
+    }
+
+    if (value && typeof value === "object") {
+        if (typeof value.label === "string") {
+            container.textContent = value.label;
+            return;
+        }
+
+        const list = document.createElement("ul");
+        list.className = "detail-values";
+        for (const [key, nestedValue] of Object.entries(value)) {
+            const listItem = document.createElement("li");
+            const label = document.createElement("strong");
+            label.textContent = `${key}: `;
+            listItem.append(label);
+            renderDetailValue(listItem, nestedValue);
+            list.append(listItem);
+        }
+        container.append(list);
+        return;
+    }
+
+    container.textContent = String(value);
 }

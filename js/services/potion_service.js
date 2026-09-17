@@ -1,4 +1,4 @@
-import { getPlayerState, addItem } from "./player_service.js";
+import { getPlayerState, addItem, removeItems } from "./player_service.js";
 import { calculatePotionSummary, brewPotionFromIngredients } from "../utils/alchemy_logic.js";
 
 export const MAX_INGREDIENTS = 10;
@@ -36,10 +36,10 @@ export function getPotionSummary() {
 }
 
 function formatIngredientText(item) {
-    const elementNames = [...(item?.damage_types ?? []), ...(item?.prefixStats ?? [])]
+    const elementNames = [...(item?.damage_types ?? item?.elements ?? []), ...(item?.prefixStats ?? [])]
         .filter(Boolean)
         .join(" ");
-    const secondaryText = (item?.suffixStats ?? item?.secondary_stats ?? []).join(" ");
+    const secondaryText = (item?.secondary_stats ?? item?.suffixStats ?? item?.stats ?? []).join(" ");
     const essenceText = (item?.essences ?? []).join(" /");
 
     return `${item?.name ?? ""} ${secondaryText} ${elementNames} ${essenceText}`.trim().toLowerCase();
@@ -58,7 +58,9 @@ export function filterIngredients(query = "") {
 export async function brewAndSavePotion() {
     if (!selectedIngredients.length) return null;
 
-    const potion = brewPotionFromIngredients(selectedIngredients);
+    const player = await getPlayerState();
+    const potion = brewPotionFromIngredients(selectedIngredients, player.level);
+    await removeItems(selectedIngredients);
     await addItem(potion);
     clearSelectedIngredients();
     return potion;

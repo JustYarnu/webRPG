@@ -9,6 +9,7 @@
 	--line: #bdcdbf;
 	--accent: #668873;
 	--accent-dark: #4f715b;
+	--panel: #ffffff;
 }
 
 * { box-sizing: border-box; }
@@ -19,7 +20,11 @@ body {
 	background: var(--paper);
 	color: var(--ink);
 	font-family: "Manrope", sans-serif;
+	transition: background-color .75s ease, color .75s ease;
 }
+
+body::after { position: fixed; inset: 0; z-index: 20; background: linear-gradient(110deg, var(--theme-transition-from), var(--theme-transition-to), var(--theme-transition-from)); background-size: 220% 100%; content: ""; opacity: 0; pointer-events: none; }
+body.area-theme-changing::after { animation: area-theme-gradient .75s ease-in-out; }
 
 h1, h2, p { margin-top: 0; }
 h1, h2 { font-family: "Bricolage Grotesque", sans-serif; }
@@ -41,7 +46,7 @@ h1, h2 { font-family: "Bricolage Grotesque", sans-serif; }
 .site-nav a:not(.site-nav__brand) { font-size: 1.15rem; }
 
 .game-screen { overflow: hidden; background: var(--paper); }
-.game-screen::before { position: fixed; inset: 0; z-index: 0; background-image: linear-gradient(rgba(102, 136, 115, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(102, 136, 115, .06) 1px, transparent 1px); background-size: 52px 52px; content: ""; pointer-events: none; }
+.game-screen::before { position: fixed; inset: 0; z-index: 0; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 52px 52px; content: ""; pointer-events: none; }
 .game-board { position: relative; z-index: 1; min-height: calc(100vh - 4.25rem); }
 .player-info-panel { position: absolute; top: 1.5rem; left: 0; width: 10.75rem; min-height: 10rem; padding: 1.5rem 1.25rem; border: 1px solid var(--line); background: var(--secondary); color: var(--ink); }
 .player-info-panel::before { position: absolute; top: 0; bottom: 0; left: -7px; width: 6px; background: var(--accent); content: ""; }
@@ -54,7 +59,7 @@ h1, h2 { font-family: "Bricolage Grotesque", sans-serif; }
 .right-rail { position: absolute; top: 3.5rem; right: 0; display: grid; gap: .65rem; width: 12.75rem; }
 .rail-button { width: 100%; margin: 0; padding: .9rem 1rem; border: 1px solid var(--line); background: var(--secondary); color: #111827; font: inherit; font-size: 1.15rem; text-align: left; }
 .rail-button { cursor: pointer; }
-.rail-button:hover { background: #d3dce7; }
+.rail-button:hover { background: var(--hover); }
 .history-belt { display: grid; gap: .65rem; max-height: calc(100vh - 10rem); overflow: hidden; }
 .history-card { position: relative; padding: .9rem 1rem; border: 1px solid var(--line); background: var(--secondary); color: #111827; font-size: 1.05rem; animation: popup-in .2s ease-out both; }
 .history-card::after { position: absolute; top: 0; right: -7px; bottom: 0; width: 6px; background: var(--accent); content: ""; }
@@ -71,7 +76,7 @@ h1, h2 { font-family: "Bricolage Grotesque", sans-serif; }
 .explore-button { position: relative; isolation: isolate; width: 100%; padding: .8rem 1.5rem; overflow: hidden; border: 1px solid var(--line); background: var(--secondary); color: #111827; font: inherit; font-size: 2rem; cursor: pointer; }
 .explore-button > span:first-child { position: relative; z-index: 1; }
 .explore-cooldown { position: absolute; inset: auto 0 0; z-index: 0; height: 4px; transform: scaleX(0); transform-origin: left; background: var(--accent); }
-.explore-button:hover:not(:disabled) { background: #d3dce7; }
+.explore-button:hover:not(:disabled) { background: var(--hover); }
 .explore-button:disabled { cursor: wait; opacity: .7; }
 .button { padding: .85rem 1.15rem; border: 1px solid transparent; font: inherit; font-weight: 700; cursor: pointer; }
 .button:disabled { cursor: wait; opacity: .7; }
@@ -95,6 +100,15 @@ h1, h2 { font-family: "Bricolage Grotesque", sans-serif; }
 @keyframes xp-popup-in {
 	from { opacity: 0; transform: translate(-50%, 8px) scale(.96); }
 	to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+@keyframes area-theme-gradient {
+	0% { background-position: 100% 0; opacity: .3; }
+	65% { opacity: .2; }
+	100% { background-position: 0 0; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+	body { transition: none; }
+	body.area-theme-changing::after { animation: none; }
 }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -123,6 +137,9 @@ h1, h2 { font-family: "Bricolage Grotesque", sans-serif; }
 .stat-list div, .detail-list div { display: flex; justify-content: space-between; gap: 1rem; padding: .85rem 0; border-top: 1px solid var(--line); }
 .stat-list dt, .detail-list dt { color: var(--muted); }
 .stat-list dd, .detail-list dd { margin: 0; font-weight: 700; text-align: right; }
+.detail-list dd:has(.detail-values) { min-width: 10rem; }
+.detail-values { display: grid; gap: .3rem; margin: 0; padding: 0; list-style: none; }
+.detail-values li { font-weight: 600; }
 .section-heading { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }
 .item-count { color: var(--muted); font-size: .9rem; }
 .inventory-list { display: grid; gap: .5rem; margin: 0; padding: 0; list-style: none; }
@@ -130,7 +147,7 @@ h1, h2 { font-family: "Bricolage Grotesque", sans-serif; }
 .inventory-item:hover { border-color: var(--accent); color: var(--accent-dark); }
 .empty-state { margin: 0; color: var(--muted); }
 .empty-state[hidden] { display: none; }
-dialog { width: min(32rem, calc(100% - 2rem)); padding: 1.5rem; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+dialog { width: min(32rem, calc(100% - 2rem)); padding: 1.5rem; border: 1px solid var(--line); background: var(--panel); opacity: 1; color: var(--ink); }
 dialog::backdrop { background: rgba(32, 43, 43, .42); }
 .area-list { display: grid; gap: .5rem; max-height: min(60vh, 26rem); margin: 0; padding: .25rem; overflow-y: auto; list-style: none; }
 .area-list li { margin: 0; }
@@ -240,7 +257,7 @@ dialog::backdrop { background: rgba(32, 43, 43, .42); }
 .gauge-bar span {
 	display: block;
 	height: 100%;
-	background: linear-gradient(90deg, var(--accent) 0%, #8aa698 100%);
+	background: linear-gradient(90deg, var(--accent) 0%, var(--gauge-end) 100%);
 	transform-origin: left center;
 	transform: scaleX(0);
 	transition: transform .2s ease;

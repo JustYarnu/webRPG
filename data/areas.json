@@ -2,52 +2,52 @@
     "areas": [
         {
             "id": 1,
-            "name": "Starting Area",
-            "description": "The beginning."
+            "name": "Starting grounds",
+            "description": "The beginning"
         },
         {
             "id": 2,
-            "name": "Forest",
-            "description": "The woods"
+            "name": "Plains",
+            "description": "The plains"
         },
         {
             "id": 3,
-            "name": "Desert",
-            "description": "The desert"
+            "name": "Forest",
+            "description": "The Forst"
         },
         {
             "id": 4,
-            "name": "Mountains",
-            "description": "The mountains"
+            "name": "Windswept Desert",
+            "description": "The Desert"
         },
         {
             "id": 5,
-            "name": "Swamp",
-            "description": "The swamp"
+            "name": "Torn Taiga",
+            "description": "The taiga"
         },
         {
             "id": 6,
-            "name": "Cave",
-            "description": "The cave"
+            "name": "Rocky Mountains",
+            "description": "The mountains"
         },
         {
             "id": 7,
-            "name": "Castle",
-            "description": "The castle"
-        },
-        {
-            "id": 8,
-            "name": "Dungeon",
-            "description": "The dungeon"
-        },
-        {
-            "id": 9,
             "name": "Volcano",
             "description": "The volcano"
         },
         {
+            "id": 8,
+            "name": "Tundra",
+            "description": "The tundra"
+        },
+        {
+            "id": 9,
+            "name": "Arctic",
+            "description": "The arctic"
+        },
+        {
             "id": 10,
-            "name": "Ocean",
+            "name": "Stony shore",
             "description": "I really need to get better descriptions. But it's ok cause they're all placeholders anyway."
         }
     ]

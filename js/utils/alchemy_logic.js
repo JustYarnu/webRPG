@@ -1,3 +1,5 @@
+import { createSecondaryStats } from "./stat_formatter.js";
+
 export const ELEMENT_TYPES = [
     "fire",
     "earth",
@@ -36,7 +38,10 @@ function getDominantElement(ingredients) {
     const counts = new Map();
 
     for (const ingredient of ingredients) {
-        const elementList = [...(ingredient?.damage_types ?? []), ...(ingredient?.prefixStats ?? [])];
+        const elementList = [
+            ...(ingredient?.damage_types ?? ingredient?.elements ?? []),
+            ...(ingredient?.prefixStats ?? []),
+        ];
         for (const element of elementList) {
             if (!element || !ELEMENT_TYPES.includes(String(element).toLowerCase())) {
                 continue;
@@ -110,18 +115,19 @@ export function calculatePotionSummary(ingredients) {
     };
 }
 
-export function brewPotionFromIngredients(ingredients) {
+export function brewPotionFromIngredients(ingredients, playerLevel = 1) {
     const summary = calculatePotionSummary(ingredients);
-    const name = summary.potionType === "Inert"
-        ? "Inert Residue"
-        : `${summary.potionType}${summary.dominantElement ? ` of ${capitalize(summary.dominantElement)}` : ""}`;
+    const name = `${summary.dominantElement ? `${capitalize(summary.dominantElement)} ` : ""}${summary.potionType} potion`;
 
     return {
         name,
         type: "potion",
         category: "alchemy",
         essences: ingredients.flatMap((ingredient) => normalizeIngredientEssence(ingredient)),
-        secondaryStats: [...new Set(ingredients.flatMap((ingredient) => ingredient?.suffixStats ?? []))],
+        secondaryStats: createSecondaryStats(
+            ingredients.flatMap((ingredient) => ingredient?.secondary_stats ?? ingredient?.suffixStats ?? ingredient?.stats ?? []),
+            playerLevel,
+        ),
         damage_types: summary.dominantElement ? [summary.dominantElement] : [],
         potionType: summary.potionType,
         dominantElement: summary.dominantElement,
