@@ -458,7 +458,7 @@ dialog::backdrop { background: rgba(32, 43, 43, .42); }
 				z-index: 1;
 			}
 			.gauge-bar > span.fill-current {
-				background: #d99a3d;
+				background: #2ECC71;
 				z-index: 2;
 			}
             .potion-type-pill--current {
