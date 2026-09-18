@@ -23,3 +23,19 @@ test('calculatePotionSummary handles a zero-potency brew as inert', () => {
     assert.equal(summary.gauges.potency.total, 20);
     assert.equal(summary.potionType, 'Inert');
 });
+
+test('calculatePotionSummary clamps each gauge between ingredients, making order matter', () => {
+    const negativeFirst = calculatePotionSummary([
+        { essences: [-2, 0, 0] },
+        { essences: [2, 0, 0] },
+    ]);
+    const positiveFirst = calculatePotionSummary([
+        { essences: [2, 0, 0] },
+        { essences: [-2, 0, 0] },
+    ]);
+
+    assert.equal(negativeFirst.gauges.viscosity.value, 2);
+    assert.equal(positiveFirst.gauges.viscosity.value, 0);
+    assert.equal(negativeFirst.gauges.viscosity.value >= 0, true);
+    assert.equal(positiveFirst.gauges.viscosity.value >= 0, true);
+});

@@ -13,7 +13,7 @@
             <a href="player.html">Player</a>
         </nav>
         <main class="alchemy-layout">
-            <section class="alchemy-panel alchemy-panel--ingredients" aria-labelledby="alchemy-heading">
+            <section class="alchemy-panel alchemy-panel--ingredients" aria-labelledby="alchemy-heading" id="ingredients-panel">
                 <div class="panel-header">
                     <div>
                         <p class="eyebrow">Profession</p>
@@ -35,37 +35,70 @@
                         <p class="eyebrow">Brew summary</p>
                         <h2 id="brew-summary-heading">Potion profile</h2>
                     </div>
-                    <span class="potion-type-pill" data-current-potion-type>Inert</span>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;">
+                        <div><small>Target:</small> <span class="potion-type-pill" data-target-potion-type>Inert</span></div>
+                        <div id="current-type-container" style="display: none;">
+                            <small>Current:</small> <span class="potion-type-pill potion-type-pill--current" data-current-potion-type>Inert</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Live Minigame Controls -->
                 <div class="alchemy-controls">
-                    <div class="temp-flex">
-                        <label for="temp-slider">Burner Heat</label>
-                        <span>Target: <span id="target-temp-display">20</span>°C</span>
-                    </div>
-                    <input type="range" id="temp-slider" min="20" max="200" value="20" style="width: 100%;" disabled />
-                    <div style="margin-top: 0.5rem; color: #ff9800; font-size: 1.1rem;">
-                        Current Temp: <strong id="current-temp-val">20°C</strong>
+                    <div style="margin-top: 0.5rem; color: #ff9800; font-size: 1.1rem; text-align: center;">
+                        Heat: <strong id="current-temp-val">20°C</strong>
                     </div>
                 </div>
 
                 <div class="gauge-grid" aria-label="Potion essence gauges">
                     <div class="gauge-card">
-                        <div class="gauge-bar" aria-label="Viscosity gauge"><span data-viscosity-fill></span></div>
-                        <div class="gauge-meta"><span>Viscosity</span><strong data-viscosity-label>0%</strong></div>
+                        <div class="gauge-bar" aria-label="Viscosity gauge">
+                            <span class="fill-potential" data-viscosity-potential></span>
+                            <span class="fill-current" data-viscosity-current></span>
+                        </div>
+                        <div class="gauge-meta">
+                            <span>Viscosity</span>
+                            <span>
+                                <strong data-viscosity-current-label>0%</strong>
+                                <span class="potential-label">/ <span data-viscosity-potential-label>0%</span></span>
+                            </span>
+                        </div>
                     </div>
                     <div class="gauge-card">
-                        <div class="gauge-bar" aria-label="Volatility gauge"><span data-volatility-fill></span></div>
-                        <div class="gauge-meta"><span>Volatility</span><strong data-volatility-label>0%</strong></div>
+                        <div class="gauge-bar" aria-label="Volatility gauge">
+                            <span class="fill-potential" data-volatility-potential></span>
+                            <span class="fill-current" data-volatility-current></span>
+                        </div>
+                        <div class="gauge-meta">
+                            <span>Volatility</span>
+                            <span>
+                                <strong data-volatility-current-label>0%</strong>
+                                <span class="potential-label">/ <span data-volatility-potential-label>0%</span></span>
+                            </span>
+                        </div>
                     </div>
                     <div class="gauge-card">
-                        <div class="gauge-bar" aria-label="Potency gauge"><span data-potency-fill></span></div>
-                        <div class="gauge-meta"><span>Potency</span><strong data-potency-label>0%</strong></div>
+                        <div class="gauge-bar" aria-label="Potency gauge">
+                            <span class="fill-potential" data-potency-potential></span>
+                            <span class="fill-current" data-potency-current></span>
+                        </div>
+                        <div class="gauge-meta">
+                            <span>Potency</span>
+                            <span>
+                                <strong data-potency-current-label>0%</strong>
+                                <span class="potential-label">/ <span data-potency-potential-label>0%</span></span>
+                            </span>
+                        </div>
                     </div>
                     <div class="gauge-card">
-                        <div class="gauge-bar" aria-label="Extraction gauge"><span data-extraction-fill></span></div>
-                        <div class="gauge-meta"><span>Stat Extraction</span><strong data-extraction-label>0%</strong></div>
+                        <!-- Extraction does not have a "potential" max limit, it's just a raw % progression -->
+                        <div class="gauge-bar" aria-label="Extraction gauge">
+                            <span class="fill-current" data-extraction-current></span>
+                        </div>
+                        <div class="gauge-meta">
+                            <span>Stat Extraction</span>
+                            <strong data-extraction-current-label>0%</strong>
+                        </div>
                     </div>
                 </div>
 
@@ -87,12 +120,28 @@
                     </ul>
                 </div>
 
-                <div class="brew-actions">
-                    <button class="button button--secondary" type="button" id="btn-add-water" disabled>Add Water</button>
-                    <button class="button button--primary brew-button" type="button" data-brew-button disabled>Brew potion</button>
+                <!-- Prep Phase Actions -->
+                <div class="brew-actions" id="prep-actions">
+                    <button class="button button--primary" type="button" id="btn-start-brew" disabled>Start Brewing</button>
+                </div>
+                
+                <!-- Live Phase Actions -->
+                <div class="brew-actions" id="live-actions" style="display: none;">
+                    <button class="button button--secondary" type="button" id="btn-add-water">Add Water</button>
+                    <button class="button button--primary" type="button" id="btn-pump-bellows">Pump Bellows</button>
+                    <button class="button button--primary brew-button" type="button" data-brew-button>Finish Potion</button>
                 </div>
             </section>
         </main>
+
+        <dialog data-alchemy-stats-dialog>
+            <form method="dialog">
+                <p class="eyebrow">Secondary stats</p>
+                <h2>Ingredient effects</h2>
+                <ul class="alchemy-stat-details" data-alchemy-stat-details></ul>
+                <button class="button button--secondary" value="close">Close</button>
+            </form>
+        </dialog>
 
         <!-- Fail State Modal -->
         <div id="fail-modal" class="fail-overlay" style="display: none;">

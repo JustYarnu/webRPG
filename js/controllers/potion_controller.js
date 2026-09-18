@@ -9,24 +9,31 @@ import {
     clearSelectedIngredients
 } from "../services/potion_service.js";
 
-let ingredientSearch, ingredientList, ingredientEmpty, ingredientCount, brewButton;
-let potionTypeLabel, dominantElementLabel, essenceTotalLabel, secondaryStatsList;
-let viscosityFill, volatilityFill, potencyFill, extractionFill;
-let viscosityLabel, volatilityLabel, potencyLabel, extractionLabel;
-let tempSlider, targetTempDisplay, currentTempDisplay, addWaterBtn;
+import { getCurrentPotionType } from "../utils/alchemy_logic.js";
+
+let ingredientSearch, ingredientList, ingredientEmpty, ingredientCount;
+let targetTypeLabel, currentTypeLabel, dominantElementLabel, essenceTotalLabel, secondaryStatsList;
+let secondaryStatsDialog, secondaryStatsDetails;
+
+let viscPotFill, volPotFill, potPotFill;
+let viscCurFill, volCurFill, potCurFill, extCurFill;
+let viscPotLabel, volPotLabel, potPotLabel;
+let viscCurLabel, volCurLabel, potCurLabel, extCurLabel;
+
+let currentTempDisplay, addWaterBtn, startBrewBtn, pumpBellowsBtn, finishBrewBtn;
 
 let gameLoopInterval = null;
 let gameState = {
+    phase: 'prep', // 'prep' or 'brew'
     active: false,
-    targetTemp: 20,
     currentTemp: 20,
-    potency: 0,
-    volatility: 0,
-    viscosity: 0,
+    dynamicVolatility: 0,
+    viscosityPenalty: 0,
     extraction: 0,
     volDangerTime: 0,
     viscDangerTime: 0,
-    failed: false
+    failed: false,
+    currentStats: { viscosity: 0, volatility: 0, potency: 0, extraction: 0 }
 };
 
 export async function initAlchemyUI() {
@@ -36,44 +43,51 @@ export async function initAlchemyUI() {
     ingredientSearch = document.querySelector("[data-ingredient-search]");
     ingredientEmpty = document.querySelector("[data-ingredient-empty]");
     ingredientCount = document.querySelector("[data-ingredient-count]");
-    brewButton = document.querySelector("[data-brew-button]");
 
-    potionTypeLabel = document.querySelector("[data-current-potion-type]");
+    startBrewBtn = document.getElementById("btn-start-brew");
+    pumpBellowsBtn = document.getElementById("btn-pump-bellows");
+    finishBrewBtn = document.querySelector("[data-brew-button]");
+    addWaterBtn = document.getElementById("btn-add-water");
+
+    targetTypeLabel = document.querySelector("[data-target-potion-type]");
+    currentTypeLabel = document.querySelector("[data-current-potion-type]");
     dominantElementLabel = document.querySelector("[data-dominant-element]");
     essenceTotalLabel = document.querySelector("[data-essence-total]");
     secondaryStatsList = document.querySelector("[data-secondary-stats]");
+    secondaryStatsDialog = document.querySelector("[data-alchemy-stats-dialog]");
+    secondaryStatsDetails = document.querySelector("[data-alchemy-stat-details]");
 
-    viscosityFill = document.querySelector("[data-viscosity-fill]");
-    volatilityFill = document.querySelector("[data-volatility-fill]");
-    potencyFill = document.querySelector("[data-potency-fill]");
-    extractionFill = document.querySelector("[data-extraction-fill]");
+    viscPotFill = document.querySelector("[data-viscosity-potential]");
+    volPotFill = document.querySelector("[data-volatility-potential]");
+    potPotFill = document.querySelector("[data-potency-potential]");
 
-    viscosityLabel = document.querySelector("[data-viscosity-label]");
-    volatilityLabel = document.querySelector("[data-volatility-label]");
-    potencyLabel = document.querySelector("[data-potency-label]");
-    extractionLabel = document.querySelector("[data-extraction-label]");
+    viscCurFill = document.querySelector("[data-viscosity-current]");
+    volCurFill = document.querySelector("[data-volatility-current]");
+    potCurFill = document.querySelector("[data-potency-current]");
+    extCurFill = document.querySelector("[data-extraction-current]");
 
-    tempSlider = document.getElementById("temp-slider");
-    targetTempDisplay = document.getElementById("target-temp-display");
+    viscPotLabel = document.querySelector("[data-viscosity-potential-label]");
+    volPotLabel = document.querySelector("[data-volatility-potential-label]");
+    potPotLabel = document.querySelector("[data-potency-potential-label]");
+
+    viscCurLabel = document.querySelector("[data-viscosity-current-label]");
+    volCurLabel = document.querySelector("[data-volatility-current-label]");
+    potCurLabel = document.querySelector("[data-potency-current-label]");
+    extCurLabel = document.querySelector("[data-extraction-current-label]");
+
     currentTempDisplay = document.getElementById("current-temp-val");
-    addWaterBtn = document.getElementById("btn-add-water");
-
     const failAckBtn = document.getElementById("fail-acknowledge");
+
     if (failAckBtn) failAckBtn.addEventListener("click", closeFailModal);
-
     if (ingredientSearch) ingredientSearch.addEventListener("input", renderIngredientList);
-    if (brewButton) brewButton.addEventListener("click", handleBrew);
+    if (startBrewBtn) startBrewBtn.addEventListener("click", handleStartBrew);
+    if (pumpBellowsBtn) pumpBellowsBtn.addEventListener("click", handlePumpBellows);
+    if (finishBrewBtn) finishBrewBtn.addEventListener("click", handleFinishBrew);
     if (addWaterBtn) addWaterBtn.addEventListener("click", handleAddWater);
-
-    if (tempSlider) {
-        tempSlider.addEventListener("input", (e) => {
-            gameState.targetTemp = parseInt(e.target.value, 10);
-            if (targetTempDisplay) targetTempDisplay.textContent = gameState.targetTemp;
-        });
-    }
 
     try {
         await loadAlchemyInventory();
+        resetMinigameState();
         updateUI();
         gameLoopInterval = setInterval(gameLoop, 100);
     } catch (error) {
@@ -85,44 +99,69 @@ export async function initAlchemyUI() {
     }
 }
 
+function handleStartBrew() {
+    if (getSelectedIngredients().length === 0) return;
+
+    gameState.phase = 'brew';
+    gameState.active = true;
+
+    document.getElementById('prep-actions').style.display = 'none';
+    document.getElementById('live-actions').style.display = 'flex';
+    document.getElementById('current-type-container').style.display = 'block';
+
+    document.getElementById('ingredients-panel').style.opacity = '0.5';
+    document.getElementById('ingredients-panel').style.pointerEvents = 'none';
+
+    updateUI();
+}
+
+function handlePumpBellows() {
+    if (!gameState.active || gameState.phase !== 'brew') return;
+
+    gameState.currentTemp = Math.min(200, gameState.currentTemp + 25);
+    gameState.dynamicVolatility += 10;
+
+    updateLiveUI();
+}
+
 function gameLoop() {
-    if (!gameState.active || gameState.failed) return;
+    if (!gameState.active || gameState.failed || gameState.phase !== 'brew') return;
 
-    const tempDiff = gameState.targetTemp - gameState.currentTemp;
-    let tempChange = 0;
-
-    if (Math.abs(tempDiff) > 0.5) {
-        tempChange = Math.sign(tempDiff) * Math.min(Math.abs(tempDiff), 3);
-        gameState.currentTemp += tempChange;
+    // Passive heat drain (1 degree per tick = 10 degrees per second)
+    if (gameState.currentTemp > 20) {
+        gameState.currentTemp = Math.max(20, gameState.currentTemp - 1);
     }
-
-    if (Math.abs(tempChange) > 1.5) {
-        gameState.volatility += Math.abs(tempChange) * 0.4;
-    }
-    gameState.volatility = Math.max(0, gameState.volatility - 0.2);
 
     if (gameState.currentTemp > 100) {
         const overHeat = gameState.currentTemp - 100;
 
-        let potencyGain = 0.05 + (overHeat * 0.001);
+        gameState.extraction += 0.5 + (overHeat * 0.015);
 
-        if (tempChange < 0) potencyGain *= 0.1;
-
-        gameState.potency += potencyGain;
-        gameState.viscosity += 0.1 + (overHeat * 0.003);
-        gameState.extraction += 0.08 + (overHeat * 0.0015);
+        if (gameState.extraction > 100) {
+            gameState.viscosityPenalty += 0.2 + (overHeat * 0.005);
+        }
     }
 
-    // Clamp bounds
-    gameState.volatility = Math.min(100, Math.max(0, gameState.volatility));
-    gameState.potency = Math.min(100, Math.max(0, gameState.potency));
-    gameState.viscosity = Math.min(100, Math.max(0, gameState.viscosity));
-    gameState.extraction = Math.min(100, Math.max(0, gameState.extraction));
+    gameState.dynamicVolatility = Math.max(0, gameState.dynamicVolatility - 0.5);
 
-    if (gameState.volatility >= 90) gameState.volDangerTime += 100;
+    const summary = getPotionSummary();
+    const extFactor = Math.min(100, gameState.extraction) / 100;
+
+    const curVisc = Math.min(100, (summary.gauges.viscosity.percent * extFactor) + gameState.viscosityPenalty);
+    const curVol = Math.min(100, (summary.gauges.volatility.percent * extFactor) + gameState.dynamicVolatility);
+    const curPot = Math.min(100, (summary.gauges.potency.percent * extFactor));
+
+    gameState.currentStats = {
+        viscosity: curVisc,
+        volatility: curVol,
+        potency: curPot,
+        extraction: Math.min(100, gameState.extraction)
+    };
+
+    if (curVol >= 90) gameState.volDangerTime += 100;
     else gameState.volDangerTime = 0;
 
-    if (gameState.viscosity >= 90) gameState.viscDangerTime += 100;
+    if (curVisc >= 90) gameState.viscDangerTime += 100;
     else gameState.viscDangerTime = 0;
 
     if (gameState.volDangerTime >= 2500) return triggerFail("Explosion! Volatility stayed critically high for too long.");
@@ -135,76 +174,87 @@ function updateUI() {
     const summary = getPotionSummary();
     const selectedCount = getSelectedIngredients().length;
 
-    updateSelectedCount();
-    updateSummaryMeta(summary);
+    if (ingredientCount) {
+        ingredientCount.textContent = `${selectedCount} / ${MAX_INGREDIENTS} selected`;
+    }
+
+    if (startBrewBtn) {
+        startBrewBtn.disabled = selectedCount === 0;
+    }
+
+    if (summary) {
+        if (targetTypeLabel) targetTypeLabel.textContent = summary.potionType;
+        if (dominantElementLabel) {
+            dominantElementLabel.textContent = summary.dominantElement
+                ? summary.dominantElement.replace(/\b\w/g, (l) => l.toUpperCase())
+                : "None";
+        }
+        if (essenceTotalLabel) essenceTotalLabel.textContent = String(summary.totalEssence);
+
+        if (viscPotFill) viscPotFill.style.transform = `scaleX(${summary.gauges.viscosity.percent / 100})`;
+        if (volPotFill) volPotFill.style.transform = `scaleX(${summary.gauges.volatility.percent / 100})`;
+        if (potPotFill) potPotFill.style.transform = `scaleX(${summary.gauges.potency.percent / 100})`;
+
+        if (viscPotLabel) viscPotLabel.textContent = `${Math.floor(summary.gauges.viscosity.percent)}%`;
+        if (volPotLabel) volPotLabel.textContent = `${Math.floor(summary.gauges.volatility.percent)}%`;
+        if (potPotLabel) potPotLabel.textContent = `${Math.floor(summary.gauges.potency.percent)}%`;
+    }
+
     renderSecondaryStats(summary);
     renderIngredientList();
 
-    if (selectedCount === 0) {
-        resetMinigameState();
-        if (tempSlider) tempSlider.disabled = true;
-        if (addWaterBtn) addWaterBtn.disabled = true;
-    } else {
-        if (!gameState.active && !gameState.failed) gameState.active = true;
-        if (tempSlider) tempSlider.disabled = false;
-        if (addWaterBtn) addWaterBtn.disabled = false;
+    if (gameState.phase === 'prep') {
+        updateLiveUI();
     }
 }
 
 function updateLiveUI() {
-    if (viscosityFill) viscosityFill.style.transform = `scaleX(${gameState.viscosity / 100})`;
-    if (volatilityFill) volatilityFill.style.transform = `scaleX(${gameState.volatility / 100})`;
-    if (potencyFill) potencyFill.style.transform = `scaleX(${gameState.potency / 100})`;
-    if (extractionFill) extractionFill.style.transform = `scaleX(${gameState.extraction / 100})`;
+    const curStats = gameState.currentStats;
 
-    if (viscosityLabel) viscosityLabel.textContent = `${Math.floor(gameState.viscosity)}%`;
-    if (volatilityLabel) volatilityLabel.textContent = `${Math.floor(gameState.volatility)}%`;
-    if (potencyLabel) potencyLabel.textContent = `${Math.floor(gameState.potency)}%`;
-    if (extractionLabel) extractionLabel.textContent = `${Math.floor(gameState.extraction)}%`;
+    if (viscCurFill) viscCurFill.style.transform = `scaleX(${curStats.viscosity / 100})`;
+    if (volCurFill) volCurFill.style.transform = `scaleX(${curStats.volatility / 100})`;
+    if (potCurFill) potCurFill.style.transform = `scaleX(${curStats.potency / 100})`;
+    if (extCurFill) extCurFill.style.transform = `scaleX(${curStats.extraction / 100})`;
+
+    if (viscCurLabel) viscCurLabel.textContent = `${Math.floor(curStats.viscosity)}%`;
+    if (volCurLabel) volCurLabel.textContent = `${Math.floor(curStats.volatility)}%`;
+    if (potCurLabel) potCurLabel.textContent = `${Math.floor(curStats.potency)}%`;
+    if (extCurLabel) extCurLabel.textContent = `${Math.floor(curStats.extraction)}%`;
 
     if (currentTempDisplay) currentTempDisplay.textContent = `${Math.floor(gameState.currentTemp)}°C`;
 
-    handleDiegeticWarnings();
+    const currentType = getCurrentPotionType(curStats.viscosity, curStats.volatility, curStats.potency);
+    if (currentTypeLabel) currentTypeLabel.textContent = currentType;
 
+    handleDiegeticWarnings(curStats);
     renderSecondaryStats(getPotionSummary());
 }
 
-function handleDiegeticWarnings() {
-    const volCard = volatilityFill?.closest('.gauge-card');
+function handleDiegeticWarnings(curStats) {
+    const volCard = volCurFill?.closest('.gauge-card');
     if (volCard) {
         volCard.classList.remove('warning-shake-heavy', 'warning-shake-light');
-        if (gameState.volatility >= 90) volCard.classList.add('warning-shake-heavy');
-        else if (gameState.volatility > 75) volCard.classList.add('warning-shake-light');
+        if (curStats.volatility >= 90) volCard.classList.add('warning-shake-heavy');
+        else if (curStats.volatility > 75) volCard.classList.add('warning-shake-light');
     }
 
-    const viscCard = viscosityFill?.closest('.gauge-card');
+    const viscCard = viscCurFill?.closest('.gauge-card');
     if (viscCard) {
         viscCard.classList.remove('warning-harden-heavy', 'warning-harden-light');
-        if (gameState.viscosity >= 90) viscCard.classList.add('warning-harden-heavy');
-        else if (gameState.viscosity > 75) viscCard.classList.add('warning-harden-light');
+        if (curStats.viscosity >= 90) viscCard.classList.add('warning-harden-heavy');
+        else if (curStats.viscosity > 75) viscCard.classList.add('warning-harden-light');
     }
-}
-
-function updateSummaryMeta(summary) {
-    if (!summary) return;
-    if (potionTypeLabel) potionTypeLabel.textContent = summary.potionType;
-    if (dominantElementLabel) {
-        dominantElementLabel.textContent = summary.dominantElement
-            ? summary.dominantElement.replace(/\b\w/g, (letter) => letter.toUpperCase())
-            : "None";
-    }
-    if (essenceTotalLabel) essenceTotalLabel.textContent = String(summary.totalEssence);
 }
 
 function handleAddWater() {
-    if (!gameState.active || gameState.failed) return;
-    gameState.viscosity = Math.max(0, gameState.viscosity - 20);
-    gameState.potency = Math.max(0, gameState.potency - 5);
-    gameState.currentTemp = Math.max(20, gameState.currentTemp - 15);
+    if (!gameState.active || gameState.failed || gameState.phase !== 'brew') return;
+    gameState.viscosityPenalty = Math.max(0, gameState.viscosityPenalty - 15);
+    gameState.currentTemp = Math.max(20, gameState.currentTemp - 40);
+    gameState.dynamicVolatility = Math.max(0, gameState.dynamicVolatility - 20);
     updateLiveUI();
 }
 
-async function handleBrew() {
+async function handleFinishBrew() {
     gameState.active = false;
     await brewAndSavePotion(gameState);
     await loadAlchemyInventory();
@@ -215,16 +265,6 @@ async function handleBrew() {
 function handleAddIngredient(item) {
     const added = addIngredient(item);
     if (added) updateUI();
-}
-
-function updateSelectedCount() {
-    const selected = getSelectedIngredients();
-    if (ingredientCount) {
-        ingredientCount.textContent = `${selected.length} / ${MAX_INGREDIENTS} selected`;
-    }
-    if (brewButton) {
-        brewButton.disabled = selected.length === 0 || gameState.failed;
-    }
 }
 
 function renderSecondaryStats(summary) {
@@ -242,14 +282,46 @@ function renderSecondaryStats(summary) {
         return;
     }
 
-    const extractionVal = Math.floor(gameState.extraction);
+    const extractionVal = Math.floor(gameState.currentStats.extraction);
+    const visibleStats = stats.slice(0, 3);
 
-    for (const stat of stats) {
+    for (const stat of visibleStats) {
         const item = document.createElement("li");
         item.className = "stat-pill";
-        const statText = stat.label ?? stat;
-        item.textContent = `${statText} (Extraction: ${extractionVal}%)`;
+        item.textContent = formatAlchemyStat(stat, extractionVal);
         secondaryStatsList.append(item);
+    }
+
+    if (stats.length > visibleStats.length) {
+        const moreButton = document.createElement("button");
+        moreButton.type = "button";
+        moreButton.className = "stat-pill stat-pill--more";
+        moreButton.textContent = "...";
+        moreButton.setAttribute("aria-label", `Show all ${stats.length} secondary stats`);
+        moreButton.addEventListener("click", () => openSecondaryStatsDialog(stats, extractionVal));
+        const moreItem = document.createElement("li");
+        moreItem.append(moreButton);
+        secondaryStatsList.append(moreItem);
+    }
+}
+
+function formatAlchemyStat(stat, extractionVal) {
+    const statText = stat?.label ?? stat?.key ?? stat;
+    return `${statText} (Extraction: ${extractionVal}%)`;
+}
+
+function openSecondaryStatsDialog(stats, extractionVal) {
+    if (!secondaryStatsDialog || !secondaryStatsDetails) return;
+
+    secondaryStatsDetails.replaceChildren();
+    for (const stat of stats) {
+        const detail = document.createElement("li");
+        detail.textContent = formatAlchemyStat(stat, extractionVal);
+        secondaryStatsDetails.append(detail);
+    }
+
+    if (typeof secondaryStatsDialog.showModal === "function") {
+        secondaryStatsDialog.showModal();
     }
 }
 
@@ -317,18 +389,32 @@ function closeFailModal() {
 
 function resetMinigameState() {
     gameState = {
+        phase: 'prep',
         active: false,
-        targetTemp: 20,
         currentTemp: 20,
-        potency: 0,
-        volatility: 0,
-        viscosity: 0,
+        dynamicVolatility: 0,
+        viscosityPenalty: 0,
         extraction: 0,
         volDangerTime: 0,
         viscDangerTime: 0,
-        failed: false
+        failed: false,
+        currentStats: { viscosity: 0, volatility: 0, potency: 0, extraction: 0 }
     };
-    if (tempSlider) tempSlider.value = 20;
-    if (targetTempDisplay) targetTempDisplay.textContent = "20";
+
+    const prepActions = document.getElementById('prep-actions');
+    const liveActions = document.getElementById('live-actions');
+    const currentTypeContainer = document.getElementById('current-type-container');
+    const ingredientsPanel = document.getElementById('ingredients-panel');
+
+    if (prepActions) prepActions.style.display = 'flex';
+    if (liveActions) liveActions.style.display = 'none';
+    if (currentTypeContainer) currentTypeContainer.style.display = 'none';
+    if (ingredientsPanel) {
+        ingredientsPanel.style.opacity = '1';
+        ingredientsPanel.style.pointerEvents = 'auto';
+    }
+
+    if (currentTempDisplay) currentTempDisplay.textContent = "20°C";
+
     updateLiveUI();
 }

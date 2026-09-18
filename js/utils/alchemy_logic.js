@@ -67,21 +67,30 @@ function getDominantElement(ingredients) {
     return dominantElement;
 }
 
+export function determinePotionTier(percent) {
+    if (percent >= 25 && percent <= 60) return "medium";
+    if (percent > 60) return "high";
+    return "low";
+}
+
+export function getCurrentPotionType(viscPercent, volPercent, potPercent) {
+    if (potPercent === 0) return "Inert";
+
+    const viscLabel = determinePotionTier(viscPercent);
+    const volLabel = determinePotionTier(volPercent);
+    const potLabel = determinePotionTier(potPercent);
+
+    return POTION_TYPE_TABLE[viscLabel]?.[volLabel]?.[potLabel] ?? "Unknown";
+}
+
 function getGaugeState(value, total) {
     const percent = total === 0 ? 0 : (value / total) * 100;
-
-    let label = "low";
-    if (percent >= 25 && percent <= 60) {
-        label = "medium";
-    } else if (percent > 60) {
-        label = "high";
-    }
 
     return {
         value,
         total,
         percent,
-        label,
+        label: determinePotionTier(percent),
     };
 }
 
@@ -89,9 +98,15 @@ export function calculatePotionSummary(ingredients) {
     const normalizedIngredients = Array.isArray(ingredients) ? ingredients : [];
     const essenceValues = normalizedIngredients.map(normalizeIngredientEssence);
 
-    const viscosity = essenceValues.reduce((total, essence) => total + (essence[0] ?? 0), 0);
-    const volatility = essenceValues.reduce((total, essence) => total + (essence[1] ?? 0), 0);
-    const potency = essenceValues.reduce((total, essence) => total + (essence[2] ?? 0), 0);
+    const accumulatedEssences = essenceValues.reduce(
+        (totals, essence) => [
+            Math.max(0, totals[0] + (essence[0] ?? 0)),
+            Math.max(0, totals[1] + (essence[1] ?? 0)),
+            Math.max(0, totals[2] + (essence[2] ?? 0)),
+        ],
+        [0, 0, 0],
+    );
+    const [viscosity, volatility, potency] = accumulatedEssences;
     const totalEssence = viscosity + volatility + potency;
 
     const gauges = {
@@ -101,10 +116,7 @@ export function calculatePotionSummary(ingredients) {
     };
 
     const dominantElement = getDominantElement(normalizedIngredients);
-    const potionType =
-        potency === 0
-            ? "Inert"
-            : POTION_TYPE_TABLE[gauges.viscosity.label]?.[gauges.volatility.label]?.[gauges.potency.label] ?? "Unknown";
+    const potionType = getCurrentPotionType(gauges.viscosity.percent, gauges.volatility.percent, gauges.potency.percent);
 
     return {
         ingredientCount: normalizedIngredients.length,
@@ -115,30 +127,44 @@ export function calculatePotionSummary(ingredients) {
     };
 }
 
-export function brewPotionFromIngredients(ingredients, playerLevel = 1) {
+function capitalize(value) {
+    if (!value) return value;
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+export function brewPotionFromIngredients(ingredients, playerLevel = 1, gameState = null) {
     const summary = calculatePotionSummary(ingredients);
-    const name = `${summary.dominantElement ? `${capitalize(summary.dominantElement)} ` : ""}${summary.potionType} potion`;
+
+    let finalType = summary.potionType;
+    let finalEssences = ingredients
+        .flatMap((ingredient) => normalizeIngredientEssence(ingredient))
+        .map((essence) => Math.max(0, essence));
+
+    if (gameState && gameState.currentStats) {
+        finalType = getCurrentPotionType(
+            gameState.currentStats.viscosity,
+            gameState.currentStats.volatility,
+            gameState.currentStats.potency
+        );
+
+        const extFactor = Math.min(100, gameState.currentStats.extraction) / 100;
+        finalEssences = finalEssences.map(e => Math.floor(e * extFactor));
+    }
+
+    const name = `${summary.dominantElement ? `${capitalize(summary.dominantElement)} ` : ""}${finalType} potion`;
 
     return {
         name,
         type: "potion",
         category: "alchemy",
-        essences: ingredients.flatMap((ingredient) => normalizeIngredientEssence(ingredient)),
+        essences: finalEssences,
         secondaryStats: createSecondaryStats(
             ingredients.flatMap((ingredient) => ingredient?.secondary_stats ?? ingredient?.suffixStats ?? ingredient?.stats ?? []),
             playerLevel,
         ),
         damage_types: summary.dominantElement ? [summary.dominantElement] : [],
-        potionType: summary.potionType,
+        potionType: finalType,
         dominantElement: summary.dominantElement,
         summary,
     };
-}
-
-function capitalize(value) {
-    if (!value) {
-        return value;
-    }
-
-    return value.charAt(0).toUpperCase() + value.slice(1);
 }
