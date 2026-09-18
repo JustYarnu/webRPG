@@ -14,7 +14,7 @@ export const ELEMENT_TYPES = [
 export const POTION_TYPE_TABLE = {
     low: {
         low: { low: "Vapor", medium: "Haze", high: "Miasma" },
-        medium: { low: "Vapor", medium: "Aerosol", high: "Plume" },
+        medium: { low: "Gas", medium: "Aerosol", high: "Plume" },
         high: { low: "Fume", medium: "Cloud", high: "Blastwave" },
     },
     medium: {

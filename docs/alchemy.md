@@ -23,7 +23,7 @@ Finally, potency determines the magnitude of the other two gauges. Uniquely, a p
 | Low | Low | Low | Vapor |
 | Low | Low | Medium | Haze |
 | Low | Low | High | Miasma |
-| Low | Medium | Low | Vapor |
+| Low | Medium | Low | Gas |
 | Low | Medium | Medium | Aerosol |
 | Low | Medium | High | Plume |
 | Low | High | Low | Fume |
