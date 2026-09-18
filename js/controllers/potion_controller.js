@@ -15,7 +15,6 @@ let viscosityFill, volatilityFill, potencyFill, extractionFill;
 let viscosityLabel, volatilityLabel, potencyLabel, extractionLabel;
 let tempSlider, targetTempDisplay, currentTempDisplay, addWaterBtn;
 
-// Minigame Loop & State
 let gameLoopInterval = null;
 let gameState = {
     active: false,
@@ -92,17 +91,14 @@ function gameLoop() {
     const tempDiff = gameState.targetTemp - gameState.currentTemp;
     let tempChange = 0;
 
-    // Inertia simulation - max 3 degrees change per 100ms tick
     if (Math.abs(tempDiff) > 0.5) {
         tempChange = Math.sign(tempDiff) * Math.min(Math.abs(tempDiff), 3);
         gameState.currentTemp += tempChange;
     }
 
-    // Volatility spikes on rapid temperature changes (> 1.5 deg/tick)
     if (Math.abs(tempChange) > 1.5) {
         gameState.volatility += Math.abs(tempChange) * 0.4;
     }
-    // Passive volatility decay
     gameState.volatility = Math.max(0, gameState.volatility - 0.2);
 
     if (gameState.currentTemp > 100) {
@@ -110,11 +106,10 @@ function gameLoop() {
 
         let potencyGain = 0.05 + (overHeat * 0.001);
 
-        // Decreasing temp acts as a pause, heavily slowing potency gain
         if (tempChange < 0) potencyGain *= 0.1;
 
         gameState.potency += potencyGain;
-        gameState.viscosity += 0.1 + (overHeat * 0.003); // Medium benefit from high temps
+        gameState.viscosity += 0.1 + (overHeat * 0.003);
         gameState.extraction += 0.08 + (overHeat * 0.0015);
     }
 
@@ -124,7 +119,6 @@ function gameLoop() {
     gameState.viscosity = Math.min(100, Math.max(0, gameState.viscosity));
     gameState.extraction = Math.min(100, Math.max(0, gameState.extraction));
 
-    // Fail states tracking
     if (gameState.volatility >= 90) gameState.volDangerTime += 100;
     else gameState.volDangerTime = 0;
 
@@ -172,7 +166,6 @@ function updateLiveUI() {
 
     handleDiegeticWarnings();
 
-    // Refresh stats extraction readouts dynamically
     renderSecondaryStats(getPotionSummary());
 }
 
