@@ -55,13 +55,15 @@ export function filterIngredients(query = "") {
     });
 }
 
-export async function brewAndSavePotion() {
+export async function brewAndSavePotion(gameState) {
     if (!selectedIngredients.length) return null;
 
     const player = await getPlayerState();
-    const potion = brewPotionFromIngredients(selectedIngredients, player.level);
+    const potion = brewPotionFromIngredients(selectedIngredients, player.level, gameState);
+
     await removeItems(selectedIngredients);
     await addItem(potion);
     clearSelectedIngredients();
+
     return potion;
 }
