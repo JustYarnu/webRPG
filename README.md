@@ -3,9 +3,7 @@ webRPG is an extensive yet simple RPG that can be played inside the browser.
 
 # Features
 
-## 3 professions, 3 systems
-
-### Alchemy
+### Alchemy Profession
 Crafting potions with alchemy is dependent on a "essence" system where ingredients carry a certain essence that dictate the type of potions. Said ingredients also carry secondary effects that mainly affect numerical values. Most ingredients come with a trade-off of secondary stats and essence points. The challenge becomes balancing these two in order to maximize effectiveness whilst still brewing the potion type you want.
 
 ## Gameplay loop
