@@ -10,6 +10,7 @@ import {
 } from "../services/potion_service.js";
 
 import { getCurrentPotionType } from "../utils/alchemy_logic.js";
+import SpriteFormatter from "../utils/sprite_formatter.js";
 
 let ingredientSearch, ingredientList, ingredientEmpty, ingredientCount;
 let targetTypeLabel, currentTypeLabel, dominantElementLabel, essenceTotalLabel, secondaryStatsList;
@@ -202,6 +203,10 @@ function updateUI() {
 
     renderSecondaryStats(summary);
     renderIngredientList();
+
+    if (summary) {
+        updatePotionSpritePreview(summary);
+    }
 
     if (gameState.phase === 'prep') {
         updateLiveUI();
@@ -418,3 +423,26 @@ function resetMinigameState() {
 
     updateLiveUI();
 }
+
+async function updatePotionSpritePreview(summary) {
+    const previewContainer = document.getElementById("live-potion-preview");
+    if (!previewContainer || !summary) return;
+
+    // Map your summary data to the required sprite parameters.
+    // Example: derive action and liquidType from summary.potionType,
+    // and derive color from summary.dominantElement.
+    const action = summary.action || "drink";
+    const liquidType = summary.liquidType || "brew";
+    const color = summary.colorRGB || [127, 255, 255];
+
+    try {
+        const canvas = await SpriteFormatter.createPotionSprite(action, liquidType, color);
+        canvas.classList.add("ui-sprite", "preview-sprite");
+
+        // Replace the old sprite with the new one
+        previewContainer.replaceChildren(canvas);
+    } catch (error) {
+        console.error("Failed to render preview sprite:", error);
+    }
+}
+

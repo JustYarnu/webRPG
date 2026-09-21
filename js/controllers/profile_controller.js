@@ -1,6 +1,7 @@
 import { getProfileOverview, getItemAttributes } from "../services/profile_service.js";
 import { loadAreas } from "../services/areas_service.js";
 import { setPlayerName } from "../services/player_service.js";
+import SpriteFormatter from "../utils/sprite_formatter.js";
 
 let inventoryListEl, emptyStateEl, itemCountEl, itemDialogEl;
 let areas = [];
@@ -93,10 +94,33 @@ function renderInventory(inventory) {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "inventory-item";
-        button.innerHTML = `<span>${item.name}</span><span aria-hidden="true">&gt;</span>`;
+
+        const spriteContainer = document.createElement("div");
+        spriteContainer.className = "item-sprite-container";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = item.name;
+
+        const arrowSpan = document.createElement("span");
+        arrowSpan.setAttribute("aria-hidden", "true");
+        arrowSpan.textContent = ">";
+
+        button.append(spriteContainer, nameSpan, arrowSpan);
         button.addEventListener("click", () => renderItemDetails(item));
         entry.append(button);
         inventoryListEl.append(entry);
+
+        if (item.action && item.liquidType) {
+            // Fallback to white/gray if no color is defined
+            const colorRGB = item.colorRGB || [200, 200, 200];
+
+            SpriteFormatter.createPotionSprite(item.action, item.liquidType, colorRGB)
+                .then(canvas => {
+                    canvas.classList.add("ui-sprite");
+                    spriteContainer.replaceChildren(canvas);
+                })
+                .catch(err => console.error("Failed to load inventory sprite:", err));
+        }
     }
 }
 

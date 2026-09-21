@@ -469,3 +469,33 @@ dialog::backdrop { background: rgba(32, 43, 43, .42); }
                 color: #888;
                 font-size: 0.85em;
             }
+
+/* Keeps pixel art crisp when scaled */
+.ui-sprite {
+    image-rendering: pixelated; 
+    object-fit: contain;
+}
+
+.item-sprite-container {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
+
+.item-sprite-container canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.potion-preview-box {
+    width: 64px;
+    height: 64px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
