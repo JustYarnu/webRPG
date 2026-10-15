@@ -1,0 +1,25 @@
+@media (max-width: 680px) {
+	.alchemy-layout {
+		grid-template-columns: 1fr;
+		padding-top: 2rem;
+	}
+	.alchemy-panel {
+		padding: 1.15rem;
+	}
+	.potion-meta-grid {
+		grid-template-columns: 1fr;
+	}
+	.game-screen { overflow: auto; }
+	.game-board { min-height: calc(100vh - 4.25rem); }
+	.player-info-panel { top: 1.5rem; width: 10.5rem; padding: 1rem; }
+	.player-info-panel h1 { font-size: 1.45rem; }
+	.area-select-panel { top: 12rem; width: 10.5rem; }
+	.right-rail { top: 1.5rem; width: 10.5rem; }
+	.rail-button, .history-card { padding: .7rem; font-size: .95rem; }
+	.exploration-center { top: 72%; width: min(18rem, calc(100vw - 2rem)); }
+	.explore-button { font-size: 1.6rem; }
+	.xp-notification { top: calc(100% + 1rem); }
+	.profile-layout { grid-template-columns: 1fr; padding-top: 2.5rem; }
+	.page-heading { margin-bottom: .5rem; }
+}
+
