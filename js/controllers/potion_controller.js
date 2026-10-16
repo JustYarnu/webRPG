@@ -11,6 +11,8 @@ import {
 
 import { getCurrentPotionType } from "../utils/alchemy_logic.js";
 import SpriteFormatter from "../utils/sprite_formatter.js";
+import { getPlayerState } from "../services/player_service.js";
+import { formatSecondaryStat } from "../utils/stat_formatter.js";
 
 let ingredientSearch, ingredientList, ingredientEmpty, ingredientCount;
 let targetTypeLabel, currentTypeLabel, dominantElementLabel, essenceTotalLabel, secondaryStatsList;
@@ -24,6 +26,9 @@ let viscCurLabel, volCurLabel, potCurLabel, extCurLabel;
 let currentTempDisplay, addWaterBtn, startBrewBtn, pumpBellowsBtn, finishBrewBtn;
 
 let gameLoopInterval = null;
+let alchemyPlayerLevel = 1;
+let previewSpriteKey = null;
+let previewSpriteRequest = 0;
 let gameState = {
     phase: 'prep', // 'prep' or 'brew'
     active: false,
@@ -87,7 +92,8 @@ export async function initAlchemyUI() {
     if (addWaterBtn) addWaterBtn.addEventListener("click", handleAddWater);
 
     try {
-        await loadAlchemyInventory();
+        const [player] = await Promise.all([getPlayerState(), loadAlchemyInventory()]);
+        alchemyPlayerLevel = player.level;
         resetMinigameState();
         updateUI();
         gameLoopInterval = setInterval(gameLoop, 100);
@@ -204,9 +210,15 @@ function updateUI() {
     renderSecondaryStats(summary);
     renderIngredientList();
 
-    if (summary) {
-        updatePotionSpritePreview(summary);
-    }
+    const currentType = getCurrentPotionType(
+        gameState.currentStats.viscosity,
+        gameState.currentStats.volatility,
+        gameState.currentStats.potency,
+    );
+    updatePotionSpritePreview(
+        gameState.phase === "brew" ? currentType : summary.potionType,
+        summary.dominantElement,
+    );
 
     if (gameState.phase === 'prep') {
         updateLiveUI();
@@ -230,9 +242,14 @@ function updateLiveUI() {
 
     const currentType = getCurrentPotionType(curStats.viscosity, curStats.volatility, curStats.potency);
     if (currentTypeLabel) currentTypeLabel.textContent = currentType;
+    const summary = getPotionSummary();
+    updatePotionSpritePreview(
+        gameState.phase === "brew" ? currentType : summary.potionType,
+        summary.dominantElement,
+    );
 
     handleDiegeticWarnings(curStats);
-    renderSecondaryStats(getPotionSummary());
+    renderSecondaryStats(summary);
 }
 
 function handleDiegeticWarnings(curStats) {
@@ -311,8 +328,16 @@ function renderSecondaryStats(summary) {
 }
 
 function formatAlchemyStat(stat, extractionVal) {
-    const statText = stat?.label ?? stat?.key ?? stat;
+    const statKey = typeof stat === "string" ? stat : stat?.key;
+    const statText = formatAlchemyStatValue(stat, statKey);
     return `${statText} (Extraction: ${extractionVal}%)`;
+}
+
+function formatAlchemyStatValue(stat, statKey = typeof stat === "string" ? stat : stat?.key) {
+    if (typeof statKey === "string") {
+        return formatSecondaryStat(statKey, alchemyPlayerLevel);
+    }
+    return stat?.label ?? String(stat);
 }
 
 function openSecondaryStatsDialog(stats, extractionVal) {
@@ -361,7 +386,9 @@ function renderIngredientList() {
 
         const details = document.createElement("div");
         details.className = "ingredient-item__details";
-        const stats = (item.secondary_stats ?? item.suffixStats ?? item.stats ?? []).join(" • ") || "No secondary stats";
+        const stats = (item.secondary_stats ?? item.suffixStats ?? item.stats ?? [])
+            .map((stat) => formatAlchemyStatValue(stat))
+            .join(" • ") || "No secondary stats";
         const elements = [...(item.damage_types ?? item.elements ?? []), ...(item.prefixStats ?? [])].filter(Boolean).join(" • ") || "Neutral";
         details.textContent = `${stats} • ${elements}`;
 
@@ -424,25 +451,22 @@ function resetMinigameState() {
     updateLiveUI();
 }
 
-async function updatePotionSpritePreview(summary) {
+async function updatePotionSpritePreview(potionType, dominantElement) {
     const previewContainer = document.getElementById("live-potion-preview");
-    if (!previewContainer || !summary) return;
+    if (!previewContainer) return;
 
-    // Map your summary data to the required sprite parameters.
-    // Example: derive action and liquidType from summary.potionType,
-    // and derive color from summary.dominantElement.
-    const action = summary.action || "drink";
-    const liquidType = summary.liquidType || "brew";
-    const color = summary.colorRGB || [127, 255, 255];
+    const { action, liquidType, color } = SpriteFormatter.getPotionSpriteOptions(potionType, dominantElement);
+    const requestKey = `${action}:${liquidType}:${color?.join(",") ?? "transparent"}`;
+    if (requestKey === previewSpriteKey) return;
 
+    previewSpriteKey = requestKey;
+    const requestId = ++previewSpriteRequest;
     try {
         const canvas = await SpriteFormatter.createPotionSprite(action, liquidType, color);
+        if (requestId !== previewSpriteRequest) return;
         canvas.classList.add("ui-sprite", "preview-sprite");
-
-        // Replace the old sprite with the new one
         previewContainer.replaceChildren(canvas);
     } catch (error) {
         console.error("Failed to render preview sprite:", error);
     }
 }
-

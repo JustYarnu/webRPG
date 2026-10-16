@@ -6,6 +6,12 @@ import SpriteFormatter from "../utils/sprite_formatter.js";
 let inventoryListEl, emptyStateEl, itemCountEl, itemDialogEl;
 let areas = [];
 let profileLevel = 1;
+let inventorySpriteObserver;
+let inventoryPageObserver;
+let inventoryItems = [];
+let renderedInventoryCount = 0;
+let itemDetailSpriteRequest = 0;
+const INVENTORY_BATCH_SIZE = 30;
 
 export async function initProfileUI() {
     inventoryListEl = document.querySelector("[data-inventory-list]");
@@ -15,6 +21,22 @@ export async function initProfileUI() {
     emptyStateEl = document.querySelector("[data-inventory-empty]");
     itemCountEl = document.querySelector("[data-inventory-count]");
     itemDialogEl = document.querySelector("[data-item-dialog]");
+    inventorySpriteObserver = typeof IntersectionObserver === "function"
+        ? new IntersectionObserver((entries, observer) => {
+            for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                observer.unobserve(entry.target);
+                renderInventorySprite(entry.target);
+            }
+        }, { rootMargin: "100px" })
+        : null;
+    inventoryPageObserver = typeof IntersectionObserver === "function"
+        ? new IntersectionObserver((entries, observer) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            observer.unobserve(inventorySentinel);
+            renderNextInventoryBatch();
+        }, { rootMargin: "400px" })
+        : null;
     initNameEditor();
 
     try {
@@ -79,7 +101,11 @@ function renderProfileStats(profile) {
 function renderInventory(inventory) {
     if (!inventoryListEl) return;
 
+    inventorySpriteObserver?.disconnect();
+    inventoryPageObserver?.disconnect();
     inventoryListEl.replaceChildren();
+    inventoryItems = inventory;
+    renderedInventoryCount = 0;
 
     if (itemCountEl) {
         itemCountEl.textContent = `${inventory.length} ${inventory.length === 1 ? "item" : "items"}`;
@@ -89,7 +115,39 @@ function renderInventory(inventory) {
         emptyStateEl.hidden = inventory.length > 0;
     }
 
-    for (const item of inventory) {
+    if (!inventory.length) return;
+
+    if (!inventoryPageObserver) {
+        while (renderedInventoryCount < inventoryItems.length) {
+            appendInventoryBatch(INVENTORY_BATCH_SIZE);
+        }
+        return;
+    }
+
+    appendInventoryBatch(INVENTORY_BATCH_SIZE);
+    if (renderedInventoryCount < inventoryItems.length) {
+        inventoryPageObserver.observe(inventorySentinel);
+    }
+}
+
+const inventorySentinel = document.createElement("li");
+inventorySentinel.className = "inventory-list__sentinel";
+inventorySentinel.setAttribute("aria-hidden", "true");
+
+function renderNextInventoryBatch() {
+    if (renderedInventoryCount >= inventoryItems.length) return;
+    appendInventoryBatch(INVENTORY_BATCH_SIZE);
+    if (renderedInventoryCount < inventoryItems.length) {
+        inventoryPageObserver.observe(inventorySentinel);
+    }
+}
+
+function appendInventoryBatch(batchSize) {
+    const inventoryEntries = document.createDocumentFragment();
+    const spriteContainers = [];
+    const end = Math.min(renderedInventoryCount + batchSize, inventoryItems.length);
+    for (; renderedInventoryCount < end; renderedInventoryCount += 1) {
+        const item = inventoryItems[renderedInventoryCount];
         const entry = document.createElement("li");
         const button = document.createElement("button");
         button.type = "button";
@@ -108,20 +166,59 @@ function renderInventory(inventory) {
         button.append(spriteContainer, nameSpan, arrowSpan);
         button.addEventListener("click", () => renderItemDetails(item));
         entry.append(button);
-        inventoryListEl.append(entry);
+        inventoryEntries.append(entry);
 
-        if (item.action && item.liquidType) {
-            // Fallback to white/gray if no color is defined
-            const colorRGB = item.colorRGB || [200, 200, 200];
+        const spriteOptions = getItemSpriteOptions(item);
 
-            SpriteFormatter.createPotionSprite(item.action, item.liquidType, colorRGB)
-                .then(canvas => {
-                    canvas.classList.add("ui-sprite");
-                    spriteContainer.replaceChildren(canvas);
-                })
-                .catch(err => console.error("Failed to load inventory sprite:", err));
+        if (spriteOptions) {
+            spriteContainer.dataset.spriteAction = spriteOptions.action;
+            spriteContainer.dataset.spriteLiquid = spriteOptions.liquidType;
+            spriteContainer.dataset.spriteColor = JSON.stringify(spriteOptions.color);
+            spriteContainers.push(spriteContainer);
         }
     }
+    inventoryListEl.append(inventoryEntries);
+    if (inventoryPageObserver && renderedInventoryCount < inventoryItems.length) {
+        inventoryListEl.append(inventorySentinel);
+    } else {
+        inventorySentinel.remove();
+    }
+
+    for (const container of spriteContainers) {
+        if (inventorySpriteObserver) inventorySpriteObserver.observe(container);
+        else renderInventorySprite(container);
+    }
+}
+
+async function renderInventorySprite(container) {
+    const { spriteAction: action, spriteLiquid: liquidType, spriteColor } = container.dataset;
+    const color = JSON.parse(spriteColor);
+
+    try {
+        const canvas = await SpriteFormatter.createPotionSprite(action, liquidType, color);
+        if (!container.isConnected) return;
+        canvas.classList.add("ui-sprite");
+        container.replaceChildren(canvas);
+    } catch (error) {
+        console.error("Failed to load inventory sprite:", error);
+    }
+}
+
+function getItemSpriteOptions(item) {
+    const dominantElement = item.dominantElement ?? item.summary?.dominantElement ?? item.damage_types?.[0];
+    const potionType = item.potionType ?? item.summary?.potionType;
+
+    if (item.action && item.liquidType) {
+        return {
+            action: item.action,
+            liquidType: item.liquidType,
+            color: item.colorRGB ?? SpriteFormatter.getElementColor(dominantElement),
+        };
+    }
+
+    return item.type === "potion" && potionType
+        ? SpriteFormatter.getPotionSpriteOptions(potionType, dominantElement)
+        : null;
 }
 
 function renderItemDetails(item) {
@@ -129,8 +226,17 @@ function renderItemDetails(item) {
 
     const dialogNameEl = document.querySelector("[data-dialog-item-name]");
     const detailsEl = document.querySelector("[data-item-details]");
+    const spriteContainer = document.querySelector("[data-dialog-item-sprite]");
 
     if (dialogNameEl) dialogNameEl.textContent = item.name;
+    if (spriteContainer) {
+        spriteContainer.replaceChildren();
+        const spriteOptions = getItemSpriteOptions(item);
+        spriteContainer.hidden = !spriteOptions;
+        if (spriteOptions) {
+            renderItemDetailSprite(spriteContainer, spriteOptions);
+        }
+    }
 
     if (detailsEl) {
         detailsEl.replaceChildren();
@@ -149,6 +255,23 @@ function renderItemDetails(item) {
 
     if (typeof itemDialogEl.showModal === "function") {
         itemDialogEl.showModal();
+    }
+}
+
+async function renderItemDetailSprite(container, spriteOptions) {
+    const requestId = ++itemDetailSpriteRequest;
+
+    try {
+        const canvas = await SpriteFormatter.createPotionSprite(
+            spriteOptions.action,
+            spriteOptions.liquidType,
+            spriteOptions.color,
+        );
+        if (requestId !== itemDetailSpriteRequest || !container.isConnected) return;
+        canvas.classList.add("ui-sprite");
+        container.replaceChildren(canvas);
+    } catch (error) {
+        console.error("Failed to load item detail sprite:", error);
     }
 }
 
